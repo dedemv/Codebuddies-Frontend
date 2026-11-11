@@ -1,0 +1,42 @@
+<div class="tela-perfil">
+  <div class="card-perfil">
+    <div class="cabecalho-perfil">
+      <div class="avatar-gigante">{{ aluno?.personagem?.icone || '🤖' }}</div>
+      <h2>{{ aluno?.nome }} ({{ aluno?.idade }} anos)</h2>
+      <p class="personagem-nome">Mascote: {{ aluno?.personagem?.nome }}</p>
+      <div class="resumo-badges">
+        <span class="badge-info">🏅 Nível 1</span>
+        <span class="badge-info">⭐ {{ totalEstrelas }} Estrelas no Total</span>
+      </div>
+    </div>
+
+    <h3>📊 Estrelas por Fase</h3>
+    <div class="lista-fases-perfil">
+      @for (f of fases; track f.id) {
+        <div class="item-fase">
+          <span>{{ f.titulo }}</span>
+          <span class="estrelas-item">⭐ {{ f.estrelas }} / 5</span>
+        </div>
+      }
+    </div>
+
+    <h3>🕒 Histórico Simplificado de Partidas</h3>
+    @if (historico.length === 0) {
+      <p class="vazio">Você ainda não jogou nenhuma fase hoje. Vamos jogar!</p>
+    } @else {
+      <div class="lista-historico">
+        @for (h of historico; track $index) {
+          <div class="item-historico">
+            <span>{{ h.data }} - {{ h.faseTitulo }}</span>
+            <strong>Ganhou ⭐ {{ h.estrelas }}</strong>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="botoes-acao">
+      <a routerLink="/personagem" class="btn-secundario">🎭 Trocar Personagem</a>
+      <a routerLink="/mapa" class="btn-primario">🗺️ Voltar ao Mapa</a>
+    </div>
+  </div>
+</div>

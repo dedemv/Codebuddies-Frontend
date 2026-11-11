@@ -1,0 +1,29 @@
+<div class="tela-personagem">
+  <div class="container">
+    <h1>Escolha seu Amigo de Aventura! 🌟</h1>
+    <p class="subtitulo">Você tem ⭐ {{ totalEstrelas }} estrelas para desbloquear personagens</p>
+
+    <div class="grade-personagens">
+      @for (p of personagens; track p.id) {
+        <div 
+          class="card-personagem"
+          [class.selecionado]="selecionado?.id === p.id"
+          [class.bloqueado]="totalEstrelas < p.estrelasNecessarias"
+          (click)="escolher(p)">
+          
+          <div class="icone-grande">{{ p.icone }}</div>
+          <h3>{{ p.nome }}</h3>
+          <p class="fala">"{{ p.fala }}"</p>
+
+          @if (totalEstrelas < p.estrelasNecessarias) {
+            <span class="badge-bloqueado">🔒 Precisa de ⭐ {{ p.estrelasNecessarias }}</span>
+          } @else {
+            <span class="badge-liberado">✅ Disponível</span>
+          }
+        </div>
+      }
+    </div>
+
+    <button class="btn-confirmar" (click)="confirmar()">IR PARA O MAPA DE FASES 🗺️</button>
+  </div>
+</div>

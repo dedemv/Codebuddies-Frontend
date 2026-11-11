@@ -1,0 +1,100 @@
+.tela-personagem {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%);
+  padding: 30px 20px;
+  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+  text-align: center;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #e65100;
+  font-size: 36px;
+  margin-bottom: 5px;
+}
+
+.subtitulo {
+  font-size: 22px;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.grade-personagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 35px;
+}
+
+.card-personagem {
+  background: white;
+  border: 5px solid #ffd54f;
+  border-radius: 25px;
+  padding: 25px 15px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+  box-shadow: 0 8px 0 #ffca28;
+}
+
+.card-personagem:hover:not(.bloqueado) {
+  transform: translateY(-5px);
+}
+
+.card-personagem.selecionado {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+  box-shadow: 0 8px 0 #2e7d32;
+}
+
+.card-personagem.bloqueado {
+  opacity: 0.6;
+  background: #eeeeee;
+  border-color: #bdbdbd;
+  box-shadow: 0 8px 0 #9e9e9e;
+  cursor: not-allowed;
+}
+
+.icone-grande {
+  font-size: 64px;
+}
+
+.fala {
+  font-size: 15px;
+  color: #666;
+  font-style: italic;
+  min-height: 45px;
+}
+
+.badge-bloqueado, .badge-liberado {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.badge-bloqueado {
+  background: #ffcdd2;
+  color: #c62828;
+}
+
+.badge-liberado {
+  background: #c8e6c9;
+  color: #2e7d32;
+}
+
+.btn-confirmar {
+  font-size: 24px;
+  font-weight: bold;
+  padding: 18px 40px;
+  border-radius: 20px;
+  border: none;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #2e7d32;
+}

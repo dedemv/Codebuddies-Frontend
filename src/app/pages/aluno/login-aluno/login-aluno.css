@@ -1,0 +1,116 @@
+.tela-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6dd5ed 0%, #2193b0 100%);
+  padding: 20px;
+  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+}
+
+.card-login {
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  border: 6px solid #ffca28;
+}
+
+.mascote-boas-vindas {
+  font-size: 72px;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 42px;
+  color: #1565c0;
+  margin: 0;
+}
+
+.subtitulo {
+  font-size: 20px;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
+
+label {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+input {
+  font-size: 24px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 4px solid #64b5f6;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: #ff9800;
+}
+
+.alerta-erro {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 3px solid #ef5350;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.alerta-aguardando {
+  background-color: #fff8e1;
+  border: 4px dashed #ffb300;
+  border-radius: 20px;
+  padding: 30px 20px;
+  color: #e65100;
+}
+
+.icone-relogio {
+  font-size: 50px;
+}
+
+.btn-entrar {
+  margin-top: 15px;
+  font-size: 26px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 20px;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #2e7d32;
+  transition: transform 0.1s;
+}
+
+.btn-entrar:active {
+  transform: translateY(4px);
+  box-shadow: 0 4px 0 #2e7d32;
+}
+
+.rodape-professor {
+  margin-top: 25px;
+}
+
+.rodape-professor a {
+  color: #78909c;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+}

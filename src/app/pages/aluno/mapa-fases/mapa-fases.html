@@ -1,0 +1,64 @@
+<div class="tela-mapa">
+  <!-- Cabeçalho com Perfil do Aluno (RF-P15) -->
+  <header class="barra-topo">
+  <div class="perfil-info">
+    <span class="avatar">{{ aluno?.personagem?.icone || '🤖' }}</span>
+    <div>
+      <h2>Olá, {{ aluno?.nome }}!</h2>
+      <span class="badge-nivel">Nível 1</span>
+    </div>
+  </div>
+
+  <!-- Menu de Navegação Infantil -->
+  <nav class="menu-navegacao">
+    <a routerLink="/personagem" class="btn-menu">🎭 Personagens</a>
+    <a routerLink="/perfil" class="btn-menu">👤 Meu Perfil</a>
+    <span class="placar-estrelas">⭐ {{ totalEstrelas }}</span>
+    <button class="btn-sair" (click)="sair()">Sair</button>
+  </nav>
+</header>
+
+<!-- Mascote Motivacional Dinâmico (RF-P16) -->
+<div class="balao-mascote">
+  <span class="mascote-icone">{{ aluno?.personagem?.icone || '🦉' }}</span>
+  <p>{{ aluno?.personagem?.fala || 'Escolha uma fase liberada para começar sua aventura!' }}</p>
+</div>
+
+  <!-- Mascote Motivacional (RF-P16) -->
+  <div class="balao-mascote">
+    <span class="mascote-icone">🦉</span>
+    <p>Escolha uma fase liberada para começar sua aventura!</p>
+  </div>
+
+  <!-- Trilha de Fases (RF-P04, RF-P05, RF-P06) -->
+  <div class="trilha-fases">
+    @for (fase of fases; track fase.id) {
+      <div 
+        class="card-fase" 
+        [class.bloqueada]="fase.status === 'bloqueada'"
+        [class.concluida]="fase.status === 'concluida'"
+        (click)="iniciarFase(fase)">
+        
+        <div class="icone-status">
+          @if (fase.status === 'bloqueada') { 🔒 }
+          @if (fase.status === 'liberada') { 🎮 }
+          @if (fase.status === 'concluida') { 🏆 }
+        </div>
+
+        <h3>{{ fase.titulo }}</h3>
+
+        <div class="estrelas-fase">
+          @for (estrela of [1, 2, 3, 4, 5]; track estrela) {
+            <span [class.ativa]="estrela <= fase.estrelas">⭐</span>
+          }
+        </div>
+
+        @if (fase.status === 'bloqueada') {
+          <span class="tag-status">Bloqueada</span>
+        } @else {
+          <button class="btn-jogar">JOGAR</button>
+        }
+      </div>
+    }
+  </div>
+</div>
