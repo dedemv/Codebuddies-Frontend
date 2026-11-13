@@ -1,0 +1,192 @@
+.tela-jogo {
+  min-height: 100vh;
+  background-color: #f3e5f5;
+  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+  padding-bottom: 40px;
+}
+
+.topo-jogo {
+  background: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-voltar {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 14px;
+  border: none;
+  background: #ff7043;
+  color: white;
+  cursor: pointer;
+}
+
+.progresso-info {
+  font-size: 22px;
+  font-weight: bold;
+  color: #6a1b9a;
+}
+
+.barra-progresso-container {
+  width: 100%;
+  height: 16px;
+  background: #e1bee7;
+}
+
+.barra-progresso-preenchimento {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.card-desafio, .card-resultado {
+  max-width: 700px;
+  margin: 40px auto;
+  background: white;
+  border-radius: 30px;
+  padding: 40px;
+  text-align: center;
+  border: 6px solid #ab47bc;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s;
+}
+
+.borda-acerto {
+  border-color: #4caf50 !important;
+  background-color: #e8f5e9;
+  transform: scale(1.02);
+}
+
+.borda-erro {
+  border-color: #ef5350 !important;
+  background-color: #ffebee;
+}
+
+.pergunta {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.dica {
+  font-size: 22px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.tecla-gigante {
+  font-size: 90px;
+  font-weight: bold;
+  color: #1565c0;
+  background: #e3f2fd;
+  width: 150px;
+  height: 150px;
+  line-height: 150px;
+  margin: 0 auto 20px;
+  border-radius: 25px;
+  border: 5px solid #42a5f5;
+  box-shadow: 0 8px 0 #1e88e5;
+}
+
+.teclado-tela, .opcoes-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.btn-tecla, .btn-opcao {
+  font-size: 36px;
+  font-weight: bold;
+  padding: 20px 35px;
+  border-radius: 20px;
+  border: 4px solid #ffb300;
+  background: #fff8e1;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #ffa000;
+  transition: transform 0.1s;
+}
+
+.btn-tecla:active, .btn-opcao:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #ffa000;
+}
+
+.banner-feedback {
+  margin-top: 25px;
+  padding: 18px;
+  border-radius: 16px;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.fundo-acerto {
+  background: #4caf50;
+  color: white;
+}
+
+.fundo-erro {
+  background: #ef5350;
+  color: white;
+}
+
+.icone-resultado {
+  font-size: 80px;
+}
+
+.estrelas-resultado {
+  font-size: 55px;
+  margin: 20px 0;
+}
+
+.estrelas-resultado span {
+  filter: grayscale(100%);
+  opacity: 0.25;
+}
+
+.estrelas-resultado span.estrela-ganha {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.placar-final {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.botoes-resultado {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.btn-acao {
+  font-size: 24px;
+  font-weight: bold;
+  padding: 18px 30px;
+  border-radius: 18px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-avancar {
+  background: #4caf50;
+  box-shadow: 0 6px 0 #2e7d32;
+}
+
+.btn-refazer {
+  background: #ff9800;
+  box-shadow: 0 6px 0 #e65100;
+}
+
+.btn-menu {
+  background: #29b6f6;
+  box-shadow: 0 6px 0 #0288d1;
+}

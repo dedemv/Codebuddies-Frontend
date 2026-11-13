@@ -1,1 +1,22 @@
-<p>login-professor works!</p>
+<div class="tela-prof-login">
+  <div class="card-prof">
+    <h2>👨‍🏫 Área do Professor</h2>
+    <p>Digite sua senha ou PIN de acesso para gerenciar a aula</p>
+
+    <form (ngSubmit)="entrar()">
+      <input 
+        type="password" 
+        [(ngModel)]="pin" 
+        name="pin" 
+        placeholder="Digite o PIN (ex: 1234)" />
+
+      @if (erro) {
+        <p class="msg-erro">{{ erro }}</p>
+      }
+
+      <button type="submit" class="btn-acessar">Acessar Painel</button>
+    </form>
+
+    <a routerLink="/entrar" class="link-voltar">⬅️ Voltar para a tela das crianças</a>
+  </div>
+</div>

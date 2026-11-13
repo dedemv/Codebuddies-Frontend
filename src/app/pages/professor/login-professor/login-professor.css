@@ -1,0 +1,53 @@
+.tela-prof-login {
+  min-height: 100vh;
+  background: #263238;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 20px;
+}
+
+.card-prof {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  font-size: 18px;
+  border: 2px solid #90a4ae;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+
+.btn-acessar {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: bold;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.msg-erro {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.link-voltar {
+  display: inline-block;
+  margin-top: 20px;
+  color: #546e7a;
+  text-decoration: none;
+}

@@ -1,1 +1,44 @@
-<p>ranking-final works!</p>
+<div class="tela-ranking">
+  <div class="card-ranking">
+    <h1>🏆 Ranking da Turma</h1>
+    <p class="subtitulo">{{ nomeTurma }}</p>
+
+    <!-- Regra RN08 / CA08: Oculto durante a sessão aberta -->
+    @if (sessaoAberta) {
+      <div class="aviso-oculto">
+        <div class="icone-grande">🤫</div>
+        <h2>O Ranking ainda é segredo!</h2>
+        <p>Continue jogando e ganhando estrelas! O ranking será revelado assim que o professor encerrar a aula.</p>
+      </div>
+    } @else {
+      <!-- Regra CA09: Exibido após o encerramento da sessão -->
+      <div class="lista-podio">
+        @for (aluno of ranking; track aluno.id; let i = $index) {
+          <div class="item-ranking" [class.primeiro]="i === 0">
+            <div class="posicao">
+              @if (i === 0) { 🥇 }
+              @else if (i === 1) { 🥈 }
+              @else if (i === 2) { 🥉 }
+              @else { {{ i + 1 }}º }
+            </div>
+            <div class="info-aluno">
+              <span class="avatar">{{ aluno.personagem.icone }}</span>
+              <div>
+                <strong>{{ aluno.nome }}</strong>
+                <span class="nivel-tag">Nível {{ aluno.nivelAtual }}</span>
+              </div>
+            </div>
+            <div class="estrelas-total">
+              ⭐ {{ aluno.estrelasTotal }}
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="botoes-rodape">
+      <a routerLink="/mapa" class="btn-voltar">🗺️ Mapa do Aluno</a>
+      <a routerLink="/professor/painel" class="btn-prof">👨‍🏫 Painel do Professor</a>
+    </div>
+  </div>
+</div>

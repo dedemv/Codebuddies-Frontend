@@ -1,1 +1,98 @@
-<p>jogar-fase works!</p>
+<div class="tela-jogo">
+  <!-- Barra de Progresso no Topo (RF-P09) -->
+  <header class="topo-jogo">
+    <button class="btn-voltar" (click)="voltarAoMenu()">⬅️ Mapa</button>
+    <h2>{{ fase?.titulo }}</h2>
+    <div class="progresso-info">
+      Desafio {{ indiceAtual + 1 }} de {{ desafios.length }}
+    </div>
+  </header>
+
+  <div class="barra-progresso-container">
+    <div 
+      class="barra-progresso-preenchimento" 
+      [style.width.%]="((indiceAtual) / desafios.length) * 100">
+    </div>
+  </div>
+
+  <!-- Área de Jogo Ativa -->
+  @if (!faseConcluida && desafios.length > 0) {
+    <main 
+      class="card-desafio"
+      [class.borda-acerto]="feedbackStatus === 'acerto'"
+      [class.borda-erro]="feedbackStatus === 'erro'">
+      
+      <p class="pergunta">{{ desafios[indiceAtual].pergunta }}</p>
+      <p class="dica">💡 Dica: {{ desafios[indiceAtual].dica }}</p>
+
+      <!-- Se for fase de Digitação -->
+      @if (fase?.tipo === 'digitacao') {
+        <div class="tecla-gigante">
+          {{ desafios[indiceAtual].alvo }}
+        </div>
+        <p class="instrucao-teclado">⌨️ Aperte essa letra no seu teclado ou clique abaixo:</p>
+        <div class="teclado-tela">
+          @for (letra of ['A', 'E', 'I', 'O', 'U']; track letra) {
+            <button class="btn-tecla" (click)="responder(letra)">{{ letra }}</button>
+          }
+        </div>
+      }
+
+      <!-- Se for fase de Mouse ou Lógica -->
+      @if (fase?.tipo !== 'digitacao') {
+        <div class="opcoes-container">
+          @for (opcao of desafios[indiceAtual].opcoes; track opcao) {
+            <button class="btn-opcao" (click)="responder(opcao)">
+              {{ opcao }}
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Feedback Visual Imediato (RF-P09) -->
+      @if (feedbackStatus !== 'neutro') {
+        <div 
+          class="banner-feedback"
+          [class.fundo-acerto]="feedbackStatus === 'acerto'"
+          [class.fundo-erro]="feedbackStatus === 'erro'">
+          {{ mensagemFeedback }}
+        </div>
+      }
+    </main>
+  }
+
+  <!-- Tela de Resultado: Sucesso (RF-P11 / CA05) ou Derrota (RF-P12 / CA06) -->
+  @if (faseConcluida) {
+    <div class="card-resultado" [class.sucesso]="aprovado" [class.derrota]="!aprovado">
+      @if (aprovado) {
+        <div class="icone-resultado">🏆</div>
+        <h1>Parabéns! Você conseguiu!</h1>
+        <p>Você desbloqueou o próximo desafio!</p>
+      } @else {
+        <div class="icone-resultado">💪</div>
+        <h1>Quase lá! Vamos tentar de novo?</h1>
+        <p>Você precisa de pelo menos 3 estrelas para avançar.</p>
+      }
+
+      <!-- Exibição de 0 a 5 estrelas (RF-P10 / CA04) -->
+      <div class="estrelas-resultado">
+        @for (estrela of [1, 2, 3, 4, 5]; track estrela) {
+          <span [class.estrela-ganha]="estrela <= estrelasObtidas">⭐</span>
+        }
+      </div>
+      <p class="placar-final">Você ganhou {{ estrelasObtidas }} de 5 estrelas!</p>
+
+      <div class="botoes-resultado">
+        @if (aprovado) {
+          <!-- Opções da Tela de Sucesso (RF-P11) -->
+          <button class="btn-acao btn-avancar" (click)="avancarProximaFase()">Avançar 🚀</button>
+          <button class="btn-acao btn-menu" (click)="voltarAoMenu()">Voltar ao menu 🗺️</button>
+        } @else {
+          <!-- Opções da Tela de Derrota (RF-P12 / CA06) -->
+          <button class="btn-acao btn-refazer" (click)="refazerFase()">Tentar de novo 🔄</button>
+          <button class="btn-acao btn-menu" (click)="voltarAoMenu()">Voltar ao menu 🗺️</button>
+        }
+      </div>
+    </div>
+  }
+</div>
