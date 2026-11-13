@@ -1,163 +1,258 @@
-.painel-container {
+.pagina-alunos {
   min-height: 100vh;
-  background: #f4f6f8;
-  padding: 30px;
+  background-color: #f4f6fb;
   font-family: 'Segoe UI', sans-serif;
+  padding-bottom: 50px;
 }
 
-.topo-painel {
+.navbar-codebuddies {
+  background: linear-gradient(90deg, #d81b60 0%, #ec407a 100%);
+  padding: 15px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: white;
+}
+
+.logo { font-size: 24px; font-weight: 900; }
+.logo .amarelo { color: #ffd600; }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { color: white; text-decoration: none; font-weight: 600; opacity: 0.85; padding-bottom: 6px; }
+.nav-links a.ativo { opacity: 1; border-bottom: 3px solid white; }
+
+.pilula-prof {
   background: white;
-  padding: 20px 30px;
-  border-radius: 16px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.acoes-topo {
-  display: flex;
-  gap: 12px;
-}
-
-.btn-link {
+  color: #333;
   text-decoration: none;
-  background: #37474f;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 10px;
+  padding: 8px 18px;
+  border-radius: 30px;
   font-weight: bold;
+  font-size: 14px;
 }
 
-.card-controle, .card-tabela {
+.container-alunos {
+  max-width: 1000px;
+  margin: 30px auto;
   background: white;
-  padding: 25px 30px;
-  border-radius: 16px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border-radius: 28px;
+  padding: 35px 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-.status-box {
-  font-size: 20px;
+.topo-secao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.topo-secao h1 {
+  color: #1a237e;
+  font-size: 30px;
+  margin: 0 0 4px;
+}
+
+.topo-secao p {
+  color: #78909c;
+  margin: 0;
+}
+
+.botoes-sessao {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-roxo {
+  background: linear-gradient(90deg, #7e57c2, #5c6bc0);
+  color: white;
+  text-decoration: none;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 25px;
   font-weight: bold;
-  margin-bottom: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-encerrar, .btn-confirmar {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-cancelar {
+  background: #90a4ae;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+/* Barra de Busca e Filtro */
+.barra-filtros {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.input-busca {
+  flex: 1;
+  background: #f8f9fc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-busca input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-size: 15px;
+  outline: none;
+}
+
+.select-filtro {
+  padding: 10px 20px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #f8f9fc;
+  font-weight: 600;
+  color: #455a64;
+}
+
+/* Cards de Alunos */
+.lista-cards-alunos {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card-aluno-item {
+  background: #f8f9fc;
+  border-radius: 20px;
+  padding: 18px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.15s;
+}
+
+.card-aluno-item:hover {
+  transform: translateY(-2px);
+}
+
+.card-aluno-item.inativo {
+  opacity: 0.45;
+}
+
+.info-esquerda {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 240px;
+}
+
+.avatar-aluno {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+}
+
+.info-esquerda h3 {
+  margin: 0;
+  color: #1a237e;
+  font-size: 17px;
+}
+
+.idade-aluno {
+  display: block;
+  font-size: 13px;
+  color: #78909c;
+}
+
+.tag-cargo {
+  display: inline-block;
+  font-size: 12px;
+  color: #5c6bc0;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Barra Central do Card */
+.progresso-centro {
+  flex: 1;
+  max-width: 320px;
+}
+
+.estrelas-mini {
+  color: #ffc107;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.estrelas-mini .apagada { color: #cfd8dc; }
+
+.linha-barra-pct {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.badge-aberta {
-  background: #e8f5e9;
-  color: #2e7d32;
-  padding: 8px 16px;
+.trilho-aluno {
+  flex: 1;
+  height: 10px;
+  background: #dce4ec;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.preenchimento-aluno {
+  height: 100%;
+  background: linear-gradient(90deg, #42a5f5, #5c6bc0);
   border-radius: 10px;
 }
 
-.badge-fechada {
-  background: #ffebee;
-  color: #c62828;
-  padding: 8px 16px;
-  border-radius: 10px;
+.pct-texto {
+  font-size: 13px;
+  color: #37474f;
 }
 
-.form-nova-sessao {
-  display: flex;
-  gap: 15px;
-}
-
-.form-nova-sessao input {
-  padding: 12px;
-  font-size: 16px;
-  border: 2px solid #cfd8dc;
-  border-radius: 10px;
-  width: 300px;
-}
-
-.btn-abrir {
-  background: #2e7d32;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-encerrar {
-  background: #d32f2f;
-  color: white;
-  border: none;
-  padding: 14px 24px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.caixa-confirmacao {
+/* Botões Direita */
+.acoes-direita {
   display: flex;
   align-items: center;
-  gap: 15px;
-  background: #fff3e0;
-  padding: 15px;
-  border-radius: 10px;
-  border: 2px solid #ffb74d;
-  font-weight: bold;
+  gap: 10px;
 }
 
-.btn-confirmar-sim {
-  background: #c62828;
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-confirmar-nao {
-  background: #78909c;
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-th, td {
-  text-align: left;
-  padding: 14px;
-  border-bottom: 1px solid #eceff1;
-}
-
-.linha-desativada {
-  opacity: 0.45;
-  background: #fafafa;
-}
-
-.status-ativo {
-  color: #2e7d32;
-  font-weight: bold;
-}
-
-.status-inativo {
-  color: #c62828;
-  font-weight: bold;
-}
-
-.btn-status {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #b0bec5;
+.btn-status-toggle {
   background: white;
-  cursor: pointer;
+  border: 1px solid #cfd8dc;
+  padding: 8px 14px;
+  border-radius: 16px;
+  font-size: 12px;
   font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-ver {
+  text-decoration: none;
+  background: #5c85d6;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 18px;
+  font-weight: bold;
+  font-size: 13px;
 }

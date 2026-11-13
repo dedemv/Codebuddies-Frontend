@@ -1,1 +1,35 @@
-<p>relatorio-final works!</p>
+<div class="relatorio-container">
+  <div class="card-relatorio">
+    <h1>📊 Relatório Final da Sessão (RF-D11)</h1>
+    <p><strong>Turma:</strong> {{ turma }} | <strong>Total de Participantes:</strong> {{ alunos.length }} alunos</p>
+    <p><strong>Média de Estrelas da Turma:</strong> ⭐ {{ mediaEstrelas }}</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Aluno</th>
+          <th>Idade</th>
+          <th>Fases Concluídas</th>
+          <th>Total de Estrelas</th>
+          <th>Status na Sessão</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of alunos; track a.id) {
+          <tr>
+            <td>{{ a.nome }}</td>
+            <td>{{ a.idade }} anos</td>
+            <td>{{ a.fasesConcluidas }} / 3</td>
+            <td>⭐ {{ a.estrelasTotal }}</td>
+            <td>{{ a.ativo ? 'Ativo' : 'Desativado (Histórico Preservado)' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="acoes">
+      <a routerLink="/professor/painel" class="btn">⬅️ Voltar ao Painel</a>
+      <a routerLink="/ranking" class="btn btn-ranking">🏆 Ver Ranking da Turma</a>
+    </div>
+  </div>
+</div>

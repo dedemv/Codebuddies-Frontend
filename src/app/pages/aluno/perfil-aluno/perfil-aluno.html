@@ -1,42 +1,95 @@
-<div class="tela-perfil">
-  <div class="card-perfil">
-    <div class="cabecalho-perfil">
-      <div class="avatar-gigante">{{ aluno?.personagem?.icone || '🤖' }}</div>
-      <h2>{{ aluno?.nome }} ({{ aluno?.idade }} anos)</h2>
-      <p class="personagem-nome">Mascote: {{ aluno?.personagem?.nome }}</p>
-      <div class="resumo-badges">
-        <span class="badge-info">🏅 Nível 1</span>
-        <span class="badge-info">⭐ {{ totalEstrelas }} Estrelas no Total</span>
+<div class="pagina-progressos">
+  <!-- Cabeçalho Magenta Oficial -->
+  <header class="navbar-codebuddies">
+    <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
+    <nav class="nav-links">
+      <a routerLink="/entrar">Início</a>
+      <a routerLink="/professor/painel">Alunos</a>
+      <a routerLink="/mapa">Fases</a>
+      <a routerLink="/perfil" class="ativo">Progressos</a>
+      <a routerLink="/ranking">Ranking</a>
+    </nav>
+    <a routerLink="/professor/painel" class="pilula-prof">👨‍🏫 Professor ⌄</a>
+  </header>
+
+  <main class="container-progressos">
+    <!-- Topo com Título e Seletor de Alunos -->
+    <div class="cabecalho-secao">
+      <div>
+        <h1>Progressos</h1>
+        <p>Acompanhe o desenvolvimento dos alunos.</p>
       </div>
-    </div>
 
-    <h3>📊 Estrelas por Fase</h3>
-    <div class="lista-fases-perfil">
-      @for (f of fases; track f.id) {
-        <div class="item-fase">
-          <span>{{ f.titulo }}</span>
-          <span class="estrelas-item">⭐ {{ f.estrelas }} / 5</span>
-        </div>
-      }
-    </div>
-
-    <h3>🕒 Histórico Simplificado de Partidas</h3>
-    @if (historico.length === 0) {
-      <p class="vazio">Você ainda não jogou nenhuma fase hoje. Vamos jogar!</p>
-    } @else {
-      <div class="lista-historico">
-        @for (h of historico; track $index) {
-          <div class="item-historico">
-            <span>{{ h.data }} - {{ h.faseTitulo }}</span>
-            <strong>Ganhou ⭐ {{ h.estrelas }}</strong>
-          </div>
+      <select class="select-alunos" (change)="aoTrocarFiltro($event)">
+        <option [value]="0">Todos os alunos ({{ alunoLogado?.nome || 'Lucas Silva' }})</option>
+        @for (a of alunosTurma; track a.id) {
+          <option [value]="a.id">{{ a.nome }} ({{ a.idade }} anos)</option>
         }
-      </div>
-    }
-
-    <div class="botoes-acao">
-      <a routerLink="/personagem" class="btn-secundario">🎭 Trocar Personagem</a>
-      <a routerLink="/mapa" class="btn-primario">🗺️ Voltar ao Mapa</a>
+      </select>
     </div>
-  </div>
+
+    <!-- Grid Principal: Esquerda (Perfil + Barras) e Direita (Cards Laterais) -->
+    <div class="grid-progressos">
+      <!-- Coluna Esquerda -->
+      <section class="coluna-principal">
+        <!-- Card de Identificação do Aluno -->
+        <div class="card-identificacao">
+          <div class="avatar-circulo">
+            {{ alunoLogado?.personagem?.icone || '🐸' }}
+          </div>
+          <div class="dados-aluno">
+            <h2>{{ alunoLogado?.nome || 'Lucas Silva' }}</h2>
+            <p class="idade-texto">{{ alunoLogado?.idade || 7 }} anos</p>
+            <p class="nivel-texto">Nível: <strong>{{ alunoLogado?.cargoNivel || 'Programador' }}</strong></p>
+            <div class="estrelas-douradas">
+              ★★★★<span class="estrela-apagada">★</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card das 5 Barras de Progresso -->
+        <div class="card-barras">
+          @for (item of metricasHabilidades; track item.nome) {
+            <div class="linha-progresso">
+              <div class="topo-barra">
+                <span class="label-habilidade">{{ item.nome }}</span>
+                <span class="valor-pct">{{ item.percentual }}%</span>
+              </div>
+              <div class="trilho-barra">
+                <div 
+                  class="preenchimento-barra" 
+                  [ngClass]="item.cor"
+                  [style.width.%]="item.percentual">
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Coluna Direita -->
+      <aside class="coluna-lateral">
+        <!-- Card Fases Concluídas -->
+        <div class="card-fases-concluidas">
+          <span>Fases concluídas</span>
+          <div class="numero-fases">
+            <strong>{{ fasesConcluidasCount }} de {{ totalFasesCount }}</strong>
+            <span class="foguete">🚀</span>
+          </div>
+        </div>
+
+        <!-- Card Motivacional "Continue assim!" -->
+        <div class="card-continue-assim">
+          <div class="trofeu">🏆</div>
+          <h3>Continue assim!</h3>
+          <p>
+            Você está indo muito bem.<br />
+            Cada desafio te deixa mais forte!
+          </p>
+          <div class="mascote-pig">🐷</div>
+          <a routerLink="/personagem" class="btn-trocar-mascote">Trocar Mascote</a>
+        </div>
+      </aside>
+    </div>
+  </main>
 </div>

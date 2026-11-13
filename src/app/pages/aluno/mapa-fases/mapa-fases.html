@@ -1,64 +1,86 @@
-<div class="tela-mapa">
-  <!-- Cabeçalho com Perfil do Aluno (RF-P15) -->
-  <header class="barra-topo">
-  <div class="perfil-info">
-    <span class="avatar">{{ aluno?.personagem?.icone || '🤖' }}</span>
+<div class="pagina-fases">
+  <!-- Navbar Superior -->
+  <header class="navbar-codebuddies">
+    <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
+    <nav class="nav-links">
+      <a routerLink="/entrar">Início</a>
+      <a routerLink="/professor/painel">Alunos</a>
+      <a routerLink="/mapa" class="ativo">Fases</a>
+      <a routerLink="/perfil">Progressos</a>
+      <a routerLink="/ranking">Ranking</a>
+    </nav>
+    <a routerLink="/perfil" class="pilula-usuario">
+      <span>{{ aluno?.personagem?.icone || '🐻‍❄️' }}</span>
+      <span>{{ aluno?.nome || 'Aluno' }}</span>
+    </a>
+  </header>
+
+  <!-- Banner Fases do Jogo -->
+  <div class="banner-fases">
     <div>
-      <h2>Olá, {{ aluno?.nome }}!</h2>
-      <span class="badge-nivel">Nível 1</span>
+      <h1>← Fases do Jogo</h1>
+      <p>Complete os desafios e avance na sua jornada!</p>
     </div>
+    <div class="mascote-banner">🐦</div>
   </div>
 
-  <!-- Menu de Navegação Infantil -->
-  <nav class="menu-navegacao">
-    <a routerLink="/personagem" class="btn-menu">🎭 Personagens</a>
-    <a routerLink="/perfil" class="btn-menu">👤 Meu Perfil</a>
-    <span class="placar-estrelas">⭐ {{ totalEstrelas }}</span>
-    <button class="btn-sair" (click)="sair()">Sair</button>
-  </nav>
-</header>
-
-<!-- Mascote Motivacional Dinâmico (RF-P16) -->
-<div class="balao-mascote">
-  <span class="mascote-icone">{{ aluno?.personagem?.icone || '🦉' }}</span>
-  <p>{{ aluno?.personagem?.fala || 'Escolha uma fase liberada para começar sua aventura!' }}</p>
-</div>
-
-  <!-- Mascote Motivacional (RF-P16) -->
-  <div class="balao-mascote">
-    <span class="mascote-icone">🦉</span>
-    <p>Escolha uma fase liberada para começar sua aventura!</p>
-  </div>
-
-  <!-- Trilha de Fases (RF-P04, RF-P05, RF-P06) -->
-  <div class="trilha-fases">
-    @for (fase of fases; track fase.id) {
-      <div 
-        class="card-fase" 
-        [class.bloqueada]="fase.status === 'bloqueada'"
-        [class.concluida]="fase.status === 'concluida'"
-        (click)="iniciarFase(fase)">
-        
-        <div class="icone-status">
-          @if (fase.status === 'bloqueada') { 🔒 }
-          @if (fase.status === 'liberada') { 🎮 }
-          @if (fase.status === 'concluida') { 🏆 }
+  <!-- Conteúdo Principal -->
+  <main class="container-fases">
+    <!-- Stepper / Trilha Numerada (1 a 5) -->
+    <div class="stepper-niveis">
+      @for (fase of fases; track fase.id) {
+        <div class="step-item">
+          <div 
+            class="circulo-step"
+            [class.step-concluido]="fase.id === 1"
+            [class.step-atual]="fase.id === 2"
+            [class.step-liberado]="fase.status !== 'bloqueada' && fase.id > 2">
+            {{ fase.id }}
+          </div>
+          <span class="step-label">{{ fase.etapaNome }}</span>
         </div>
+      }
+    </div>
 
-        <h3>{{ fase.titulo }}</h3>
+    <!-- Grade de Cards Coloridos das Fases -->
+    <div class="grade-cards-fases">
+      @for (fase of fases; track fase.id) {
+        <div class="card-fase-colorido" [ngClass]="'cor-' + fase.corCard">
+          <div class="ilustracao-card">{{ fase.mascoteIcone }}</div>
 
-        <div class="estrelas-fase">
-          @for (estrela of [1, 2, 3, 4, 5]; track estrela) {
-            <span [class.ativa]="estrela <= fase.estrelas">⭐</span>
-          }
+          <div class="info-card">
+            <span class="subtitulo-fase">{{ fase.subtitulo }}</span>
+            <div class="linha-titulo">
+              <h3>{{ fase.titulo }}</h3>
+              @if (fase.status === 'bloqueada') {
+                <span class="cadeado-branco">🔒</span>
+              }
+            </div>
+
+            @if (fase.status !== 'bloqueada') {
+              <div class="estrelas-card">
+                @for (e of [1, 2, 3, 4, 5]; track e) {
+                  <span [class.acesa]="e <= fase.estrelas">★</span>
+                }
+              </div>
+              <button class="btn-jogar-amarelo" (click)="iniciarFase(fase)">
+                Jogar
+              </button>
+            } @else {
+              <div class="btn-bloqueada">
+                🔒 Bloqueada
+              </div>
+            }
+          </div>
         </div>
+      }
 
-        @if (fase.status === 'bloqueada') {
-          <span class="tag-status">Bloqueada</span>
-        } @else {
-          <button class="btn-jogar">JOGAR</button>
-        }
+      <!-- 6º Card Motivacional ("Você consegue!") do Protótipo -->
+      <div class="card-incentivo">
+        <div class="trofeu-icone">🏆</div>
+        <h3>Você consegue!</h3>
+        <p>Cada fase é um novo desafio e uma nova aprendizagem.</p>
       </div>
-    }
-  </div>
+    </div>
+  </main>
 </div>

@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Sessao, Fase } from '../../../core/services/sessao';
 import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-mapa-fases',
   standalone: true,
-  imports: [RouterLink], // <-- Adicione RouterLink aqui!
+  imports: [RouterLink, CommonModule], // <-- Adicione RouterLink aqui!
   templateUrl: './mapa-fases.html',
-  styleUrl: './mapa-fases.css'
+  styleUrl: './mapa-fases.css',
 })
 export class MapaFases implements OnInit {
   aluno: any = null;

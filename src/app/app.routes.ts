@@ -7,6 +7,8 @@ import { JogarFase } from './pages/aluno/jogar-fase/jogar-fase';
 import { LoginProfessor } from './pages/professor/login-professor/login-professor';
 import { PainelSessao } from './pages/professor/painel-sessao/painel-sessao';
 import { RankingFinal } from './pages/compartilhado/ranking-final/ranking-final';
+import { RelatorioFinal } from './pages/professor/relatorio-final/relatorio-final';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: 'entrar', pathMatch: 'full' },
@@ -23,5 +25,8 @@ export const routes: Routes = [
   { path: 'professor/painel', component: PainelSessao },
   
   // Ranking
-  { path: 'ranking', component: RankingFinal }
+  { path: 'ranking', component: RankingFinal },
+
+  // Relatório
+  { path: 'professor/relatorio', component: RelatorioFinal }
 ];

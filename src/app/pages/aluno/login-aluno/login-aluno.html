@@ -1,51 +1,125 @@
-<div class="tela-login">
-  <div class="card-login">
-    <div class="mascote-boas-vindas">🤖</div>
-    <h1>CodeBuddies</h1>
-    <p class="subtitulo">Vamos aprender tecnologia brincando!</p>
-
-    <!-- Critério de Aceitação CA01: Sessão fechada -->
-    @if (!sessaoAberta) {
-      <div class="alerta-aguardando">
-        <span class="icone-relogio">⏳</span>
-        <h2>Aguardando professor iniciar a aula</h2>
-      </div>
-    }
-
-    <!-- Formulário de Login Simples (RF-P01) -->
-    @if (sessaoAberta) {
-      <form (ngSubmit)="entrar()" class="formulario">
-        <label for="nome">Qual é o seu nome?</label>
-        <input 
-          id="nome" 
-          type="text" 
-          [(ngModel)]="nome" 
-          name="nome" 
-          placeholder="Escreva seu nome..." 
-          autocomplete="off" />
-
-        <label for="idade">Quantos anos você tem?</label>
-        <input 
-          id="idade" 
-          type="number" 
-          [(ngModel)]="idade" 
-          name="idade" 
-          min="5" 
-          max="8" 
-          placeholder="Ex: 6" />
-
-        @if (erroMensagem) {
-          <div class="alerta-erro">
-            ⚠️ {{ erroMensagem }}
-          </div>
-        }
-
-        <button type="submit" class="btn-entrar">COMEÇAR A JOGAR! 🚀</button>
-      </form>
-    }
-
-    <div class="rodape-professor">
-      <a routerLink="/professor/login">Área do Professor</a>
+<div class="pagina-home">
+  <!-- Navbar Superior Oficial do Protótipo -->
+  <header class="navbar-codebuddies">
+    <div class="logo">
+      <span class="logo-icone">🎮</span>
+      <span class="logo-texto">CODE<span class="amarelo">BUDDIES</span></span>
     </div>
-  </div>
+
+    <nav class="nav-links">
+      <a routerLink="/entrar" class="ativo">Início</a>
+      <a routerLink="/professor/painel">Alunos</a>
+      <a routerLink="/mapa">Fases</a>
+      <a routerLink="/perfil">Progressos</a>
+      <a routerLink="/ranking">Ranking</a>
+    </nav>
+
+    <a routerLink="/professor/login" class="pilula-professor">
+      <span class="avatar-prof">👨‍🏫</span>
+      <span>Professor ⌄</span>
+    </a>
+  </header>
+
+  <!-- Hero Banner Magenta -->
+  <section class="hero-section">
+    <div class="hero-texto">
+      <h1>
+        Aprender<br />
+        programação pode ser<br />
+        <span class="destaque-amarelo">uma aventura!</span>
+      </h1>
+      <p class="descricao">
+        No CodeBuddies, as crianças aprendem programação de forma divertida,
+        através de desafios, fases e muita brincadeira!
+      </p>
+
+      <!-- CA01: Se não houver sessão aberta -->
+      @if (!sessaoAberta) {
+        <div class="alerta-aguardando">
+          ⏳ <strong>Aguardando professor iniciar a aula</strong>
+        </div>
+      }
+
+      <!-- Formulário Integrado ao Hero para Entrar na Aventura (RF-P01) -->
+      @if (sessaoAberta) {
+        <form (ngSubmit)="entrar()" class="form-aventura">
+          <div class="inputs-linha">
+            <input 
+              type="text" 
+              [(ngModel)]="nome" 
+              name="nome" 
+              placeholder="Digite seu nome..." 
+              autocomplete="off" />
+            <input 
+              type="number" 
+              [(ngModel)]="idade" 
+              name="idade" 
+              min="5" 
+              max="8" 
+              placeholder="Idade (5-8)" 
+              class="input-idade" />
+          </div>
+
+          @if (erroMensagem) {
+            <div class="msg-erro">⚠️ {{ erroMensagem }}</div>
+          }
+
+          <div class="botoes-hero">
+            <button type="submit" class="btn-amarelo">
+              Começar aventura ➔
+            </button>
+            <a routerLink="/personagem" class="btn-contorno">
+              Escolher Mascote
+            </a>
+          </div>
+        </form>
+      }
+    </div>
+
+    <!-- Grupo de Mascotes à Direita -->
+    <div class="hero-ilustracao">
+      <div class="bolha-codigo">&lt;/&gt;</div>
+      <div class="grupo-mascotes">
+        <span class="mascote-principal">🤖</span>
+        <div class="mascotes-menores">
+          <span>🐷</span>
+          <span>🐸</span>
+          <span>🦊</span>
+          <span>🐻‍❄️</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção Inferior: Minha Aventura -->
+  <section class="secao-minha-aventura">
+    <h2>Minha aventura</h2>
+    <div class="cards-resumo">
+      <div class="card-metrica">
+        <div class="icone-metrica">⭐</div>
+        <strong>245</strong>
+        <span>ESTRELAS</span>
+      </div>
+
+      <div class="card-metrica">
+        <div class="icone-metrica">🏆</div>
+        <strong>1.280</strong>
+        <span>PONTOS</span>
+      </div>
+
+      <div class="card-metrica">
+        <div class="icone-metrica">🚀</div>
+        <strong>8/12</strong>
+        <span>FASES</span>
+      </div>
+
+      <div class="card-metrica card-proximo">
+        <div class="icone-metrica">🎯</div>
+        <div>
+          <strong>Próximo desafio</strong>
+          <p>Loops e Repetições</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>

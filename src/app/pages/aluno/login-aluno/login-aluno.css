@@ -1,116 +1,248 @@
-.tela-login {
+.pagina-home {
   min-height: 100vh;
+  background-color: #fafbfc;
+  font-family: 'Segoe UI', 'Poppins', sans-serif;
+}
+
+/* Navbar Magenta Oficial */
+.navbar-codebuddies {
+  background: linear-gradient(90deg, #d81b60 0%, #ec407a 100%);
+  padding: 16px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.logo {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #6dd5ed 0%, #2193b0 100%);
-  padding: 20px;
-  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+  gap: 10px;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
-.card-login {
-  background: #ffffff;
-  border-radius: 30px;
-  padding: 40px;
-  width: 100%;
-  max-width: 480px;
-  text-align: center;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  border: 6px solid #ffca28;
+.logo .amarelo {
+  color: #ffd600;
 }
 
-.mascote-boas-vindas {
-  font-size: 72px;
-  margin-bottom: 10px;
-}
-
-h1 {
-  font-size: 42px;
-  color: #1565c0;
-  margin: 0;
-}
-
-.subtitulo {
-  font-size: 20px;
-  color: #555;
-  margin-bottom: 30px;
-}
-
-.formulario {
+.nav-links {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-  text-align: left;
+  gap: 30px;
 }
 
-label {
-  font-size: 22px;
-  font-weight: bold;
+.nav-links a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  padding-bottom: 6px;
+}
+
+.nav-links a.ativo {
+  color: white;
+  border-bottom: 3px solid white;
+}
+
+.pilula-professor {
+  background: white;
   color: #333;
-}
-
-input {
-  font-size: 24px;
-  padding: 16px;
-  border-radius: 16px;
-  border: 4px solid #64b5f6;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-input:focus {
-  border-color: #ff9800;
-}
-
-.alerta-erro {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 3px solid #ef5350;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 22px;
+  text-decoration: none;
+  padding: 8px 18px;
+  border-radius: 30px;
   font-weight: bold;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+  color: white;
+  padding: 50px 60px 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+}
+
+.hero-texto {
+  max-width: 580px;
+}
+
+.hero-texto h1 {
+  font-size: 48px;
+  line-height: 1.15;
+  font-weight: 800;
+  margin: 0 0 20px;
+}
+
+.destaque-amarelo {
+  color: #ffd600;
+}
+
+.descricao {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.95;
+  margin-bottom: 25px;
+}
+
+.inputs-linha {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.inputs-linha input {
+  padding: 15px 20px;
+  border-radius: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  font-size: 18px;
+  outline: none;
+  flex: 1;
+}
+
+.inputs-linha .input-idade {
+  max-width: 140px;
+}
+
+.msg-erro {
+  background: #ffebee;
+  color: #c62828;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
 
 .alerta-aguardando {
-  background-color: #fff8e1;
-  border: 4px dashed #ffb300;
-  border-radius: 20px;
-  padding: 30px 20px;
-  color: #e65100;
-}
-
-.icone-relogio {
-  font-size: 50px;
-}
-
-.btn-entrar {
-  margin-top: 15px;
-  font-size: 26px;
-  font-weight: bold;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px dashed #ffd600;
   padding: 20px;
-  border-radius: 20px;
+  border-radius: 16px;
+  font-size: 20px;
+}
+
+.botoes-hero {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.btn-amarelo {
+  background: #ffd600;
+  color: #212121;
+  font-size: 18px;
+  font-weight: 800;
+  padding: 16px 32px;
+  border-radius: 30px;
   border: none;
-  background-color: #4caf50;
-  color: white;
   cursor: pointer;
-  box-shadow: 0 8px 0 #2e7d32;
-  transition: transform 0.1s;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s;
 }
 
-.btn-entrar:active {
-  transform: translateY(4px);
-  box-shadow: 0 4px 0 #2e7d32;
+.btn-amarelo:hover {
+  transform: translateY(-2px);
 }
 
-.rodape-professor {
-  margin-top: 25px;
-}
-
-.rodape-professor a {
-  color: #78909c;
+.btn-contorno {
+  color: white;
   text-decoration: none;
-  font-size: 16px;
+  font-weight: 700;
+  padding: 15px 28px;
+  border-radius: 30px;
+  border: 2px solid white;
+}
+
+.hero-ilustracao {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 35px;
+  border-radius: 50%;
+  text-align: center;
+  position: relative;
+}
+
+.bolha-codigo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #7c4dff;
+  color: white;
+  font-weight: 900;
+  padding: 10px 18px;
+  border-radius: 16px;
+  font-size: 22px;
+}
+
+.mascote-principal {
+  font-size: 110px;
+  display: block;
+}
+
+.mascotes-menores {
+  font-size: 48px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* Seção Minha Aventura */
+.secao-minha-aventura {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 30px 50px;
+}
+
+.secao-minha-aventura h2 {
+  color: #1a237e;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.cards-resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.card-metrica {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.icone-metrica {
+  font-size: 38px;
+}
+
+.card-metrica strong {
+  font-size: 28px;
+  color: #1a237e;
+}
+
+.card-metrica span {
+  font-size: 12px;
+  color: #78909c;
   font-weight: bold;
+}
+
+.card-proximo {
+  background: #f3e5f5;
+  flex-direction: row;
+  text-align: left;
+  gap: 16px;
 }

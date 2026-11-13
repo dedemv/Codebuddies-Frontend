@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 
 export interface Fase {
   id: number;
   nivel: number;
+  subtitulo: string;
   titulo: string;
+  etapaNome: string;
+  corCard: string;
+  mascoteIcone: string;
   tipo: 'digitacao' | 'logica' | 'mouse';
   status: 'liberada' | 'bloqueada' | 'concluida';
   estrelas: number;
@@ -15,6 +20,7 @@ export interface Personagem {
   id: string;
   nome: string;
   icone: string;
+  corFundo: string;
   fala: string;
   estrelasNecessarias: number;
 }
@@ -23,9 +29,12 @@ export interface AlunoSessao {
   id: number;
   nome: string;
   idade: number;
+  cargoNivel: string;
+  progressoPct: number;
   personagem: Personagem;
   nivelAtual: number;
   estrelasTotal: number;
+  pontos: number;
   fasesConcluidas: number;
   ativo: boolean;
 }
@@ -34,48 +43,62 @@ export interface AlunoSessao {
   providedIn: 'root'
 })
 export class Sessao {
+  private apiUrl = 'http://localhost:3333/api';
+
   public sessaoAbertaMock = true;
   public nomeTurmaAtual = 'Turma AMPLA - Platina';
+  public sessaoIdAtual: string | number = 1;
 
+  // Os 6 Personagens oficiais do Design do Grupo
   public personagens: Personagem[] = [
-    { id: 'robo-menin', nome: 'Bia Bot (Feminino)', icone: '👩‍🚀', fala: 'Vamos explorar o espaço digital!', estrelasNecessarias: 0 },
-    { id: 'robo-menino', nome: 'Leo Bit (Masculino)', icone: '🧑‍🚀', fala: 'Pronto para programar essa missão!', estrelasNecessarias: 0 },
-    { id: 'coruja-sabia', nome: 'Coruja Byte', icone: '🦉', fala: 'A lógica é o nosso superpoder!', estrelasNecessarias: 3 },
-    { id: 'dragao-code', nome: 'Dragão Pixel', icone: '🐲', fala: 'Você já é um mestre do teclado!', estrelasNecessarias: 6 }
+    { id: 'white-dog', nome: 'White Dog', icone: '🐻‍❄️', corFundo: '#e3f2fd', fala: 'Vamos dar os primeiros passos!', estrelasNecessarias: 0 },
+    { id: 'pig', nome: 'Pig', icone: '🐷', corFundo: '#fce4ec', fala: 'Programar é muito divertido!', estrelasNecessarias: 0 },
+    { id: 'green-dog', nome: 'Green Dog', icone: '🐸', corFundo: '#e8f5e9', fala: 'Coloque o fone e vamos codar!', estrelasNecessarias: 0 },
+    { id: 'puppy', nome: 'Puppy', icone: '🐶', corFundo: '#fff9c4', fala: 'Qual é o próximo comando?', estrelasNecessarias: 3 },
+    { id: 'duck', nome: 'Space Duck', icone: '🐦', corFundo: '#e1f5fe', fala: 'Explorando o universo dos códigos!', estrelasNecessarias: 5 },
+    { id: 'fox', nome: 'Fox', icone: '🦊', corFundo: '#fff3e0', fala: 'Você já domina as funções!', estrelasNecessarias: 8 }
   ];
 
+  // As 5 Fases do Design ("Fases do Jogo")
   private fasesMock: Fase[] = [
-    { id: 1, nivel: 1, titulo: 'Fase 1: Caça às Letras', tipo: 'digitacao', status: 'liberada', estrelas: 0 },
-    { id: 2, nivel: 1, titulo: 'Fase 2: Clique Rápido', tipo: 'mouse', status: 'bloqueada', estrelas: 0 },
-    { id: 3, nivel: 1, titulo: 'Fase 3: Sequência Lógica', tipo: 'logica', status: 'bloqueada', estrelas: 0 }
+    { id: 1, nivel: 1, subtitulo: 'FASE 01', titulo: 'Primeiros passos', etapaNome: 'Iniciante', corCard: 'verde', mascoteIcone: '🐻‍❄️', tipo: 'digitacao', status: 'liberada', estrelas: 4 },
+    { id: 2, nivel: 1, subtitulo: 'FASE 02', titulo: 'Comandos', etapaNome: 'Comandos', corCard: 'azul', mascoteIcone: '🐦', tipo: 'mouse', status: 'liberada', estrelas: 2 },
+    { id: 3, nivel: 1, subtitulo: 'FASE 03', titulo: 'Loops', etapaNome: 'Loops', corCard: 'roxo', mascoteIcone: '🐸', tipo: 'logica', status: 'bloqueada', estrelas: 0 },
+    { id: 4, nivel: 1, subtitulo: 'FASE 04', titulo: 'Funções', etapaNome: 'Funções', corCard: 'rosa', mascoteIcone: '🦊', tipo: 'logica', status: 'bloqueada', estrelas: 0 },
+    { id: 5, nivel: 1, subtitulo: 'FASE 05', titulo: 'Projetos Finais', etapaNome: 'Projetos', corCard: 'laranja', mascoteIcone: '🤖', tipo: 'digitacao', status: 'bloqueada', estrelas: 0 }
   ];
 
   private historicoMock: { faseTitulo: string; estrelas: number; data: string }[] = [];
 
-  // Lista simulada de alunos na sessão para o painel do professor e ranking (RF-D07, RF-P13)
+  // Alunos conforme a tela de Alunos e Ranking do protótipo
   private alunosSessaoMock: AlunoSessao[] = [
-    { id: 1, nome: 'Ana Clara', idade: 6, personagem: this.personagens[0], nivelAtual: 1, estrelasTotal: 12, fasesConcluidas: 3, ativo: true },
-    { id: 2, nome: 'Pedro Henrique', idade: 7, personagem: this.personagens[1], nivelAtual: 1, estrelasTotal: 9, fasesConcluidas: 2, ativo: true },
-    { id: 3, nome: 'Mateus', idade: 5, personagem: this.personagens[2], nivelAtual: 1, estrelasTotal: 5, fasesConcluidas: 1, ativo: true }
+    { id: 1, nome: 'Ana Clara', idade: 6, cargoNivel: 'Explorador', progressoPct: 80, personagem: this.personagens[3], nivelAtual: 1, estrelasTotal: 5, pontos: 1250, fasesConcluidas: 4, ativo: true },
+    { id: 2, nome: 'Lucas Silva', idade: 7, cargoNivel: 'Programador', progressoPct: 60, personagem: this.personagens[2], nivelAtual: 1, estrelasTotal: 4, pontos: 1120, fasesConcluidas: 3, ativo: true },
+    { id: 3, nome: 'Sofia / Maria Eduarda', idade: 5, cargoNivel: 'Iniciante', progressoPct: 40, personagem: this.personagens[1], nivelAtual: 1, estrelasTotal: 4, pontos: 980, fasesConcluidas: 2, ativo: true },
+    { id: 4, nome: 'Pedro Henrique', idade: 8, cargoNivel: 'Avançado', progressoPct: 90, personagem: this.personagens[5], nivelAtual: 1, estrelasTotal: 3, pontos: 870, fasesConcluidas: 2, ativo: true },
+    { id: 5, nome: 'Juliana Souza', idade: 6, cargoNivel: 'Explorador', progressoPct: 70, personagem: this.personagens[0], nivelAtual: 1, estrelasTotal: 3, pontos: 760, fasesConcluidas: 2, ativo: true }
   ];
 
   constructor(private http: HttpClient) {}
 
   verificarSessaoAberta(): Observable<{ aberta: boolean; turma: string }> {
-    if (typeof window !== 'undefined') {
-      const statusSalvo = localStorage.getItem('sessao_aberta_codebuddies');
-      if (statusSalvo !== null) {
-        this.sessaoAbertaMock = JSON.parse(statusSalvo);
-      }
-      const turmaSalva = localStorage.getItem('nome_turma_codebuddies');
-      if (turmaSalva) {
-        this.nomeTurmaAtual = turmaSalva;
-      }
-    }
-    return of({ aberta: this.sessaoAbertaMock, turma: this.nomeTurmaAtual });
+    return this.http.get<any>(`${this.apiUrl}/sessoes/ativa`).pipe(
+      map(res => ({
+        aberta: res?.status === 'aberta' || res?.aberta === true,
+        turma: res?.turma?.nome || res?.nomeTurma || this.nomeTurmaAtual
+      })),
+      catchError(() => {
+        if (typeof window !== 'undefined') {
+          const statusSalvo = localStorage.getItem('sessao_aberta_codebuddies');
+          if (statusSalvo !== null) this.sessaoAbertaMock = JSON.parse(statusSalvo);
+          const turmaSalva = localStorage.getItem('nome_turma_codebuddies');
+          if (turmaSalva) this.nomeTurmaAtual = turmaSalva;
+        }
+        return of({ aberta: this.sessaoAbertaMock, turma: this.nomeTurmaAtual });
+      })
+    );
   }
 
-  // UC 04: Criar e Abrir Sessão de Aula
   abrirSessao(nomeTurma: string): void {
     this.nomeTurmaAtual = nomeTurma || 'Turma AMPLA - Platina';
     this.sessaoAbertaMock = true;
@@ -83,47 +106,68 @@ export class Sessao {
       localStorage.setItem('sessao_aberta_codebuddies', 'true');
       localStorage.setItem('nome_turma_codebuddies', this.nomeTurmaAtual);
     }
+
+    this.http.post<any>(`${this.apiUrl}/sessoes`, { nomeTurma: this.nomeTurmaAtual }).pipe(
+      catchError(() => of(null))
+    ).subscribe(res => {
+      if (res?.id) this.sessaoIdAtual = res.id;
+    });
   }
 
-  // UC 05: Encerrar Sessão e bloquear novos logins
   encerrarSessao(): void {
     this.sessaoAbertaMock = false;
     if (typeof window !== 'undefined') {
       localStorage.setItem('sessao_aberta_codebuddies', 'false');
     }
+
+    this.http.patch(`${this.apiUrl}/sessoes/${this.sessaoIdAtual}/encerrar`, {}).pipe(
+      catchError(() => of(null))
+    ).subscribe();
   }
 
-  // RF-P01, RF-P03, RF-D09: Cria ou recupera aluno sem duplicar o par (nome, idade)
   entrarNaSessao(nome: string, idade: number): Observable<any> {
     const atual = this.obterAlunoLogado();
-    const aluno = {
+    const alunoLocal = {
+      id: Date.now(),
       nome,
       idade,
       personagem: atual?.personagem || this.personagens[0]
     };
 
+    return this.http.post<any>(`${this.apiUrl}/alunos/entrar`, { nome, idade }).pipe(
+      tap(res => {
+        const dadosSalvar = { ...alunoLocal, ...(res || {}) };
+        this.salvarAlunoNoStorage(dadosSalvar);
+      }),
+      catchError(() => {
+        this.salvarAlunoNoStorage(alunoLocal);
+        return of(alunoLocal);
+      })
+    );
+  }
+
+  private salvarAlunoNoStorage(aluno: any): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('aluno_codebuddies', JSON.stringify(aluno));
     }
-
-    // Verifica se o par (nome, idade) já existe na lista da sessão (RF-P02, RF-P03)
     const existente = this.alunosSessaoMock.find(
-      a => a.nome.toLowerCase() === nome.toLowerCase() && a.idade === idade
+      a => a.nome.toLowerCase() === aluno.nome.toLowerCase() && a.idade === aluno.idade
     );
     if (!existente) {
       this.alunosSessaoMock.push({
-        id: this.alunosSessaoMock.length + 1,
-        nome,
-        idade,
-        personagem: aluno.personagem,
+        id: aluno.id || this.alunosSessaoMock.length + 1,
+        nome: aluno.nome,
+        idade: aluno.idade,
+        cargoNivel: 'Iniciante',
+        progressoPct: 20,
+        personagem: aluno.personagem || this.personagens[0],
         nivelAtual: 1,
         estrelasTotal: this.obterTotalEstrelas(),
+        pontos: this.obterTotalEstrelas() * 250,
         fasesConcluidas: this.fasesMock.filter(f => f.status === 'concluida').length,
         ativo: true
       });
     }
-
-    return of(aluno);
   }
 
   selecionarPersonagem(personagem: Personagem): void {
@@ -146,6 +190,10 @@ export class Sessao {
 
   obterTotalEstrelas(): number {
     return this.fasesMock.reduce((soma, f) => soma + f.estrelas, 0);
+  }
+
+  obterTotalPontos(): number {
+    return this.obterTotalEstrelas() * 210;
   }
 
   obterHistorico() {
@@ -174,7 +222,6 @@ export class Sessao {
         }
       }
 
-      // Atualiza também na tabela do professor
       const logado = this.obterAlunoLogado();
       if (logado) {
         const registro = this.alunosSessaoMock.find(
@@ -182,29 +229,37 @@ export class Sessao {
         );
         if (registro) {
           registro.estrelasTotal = this.obterTotalEstrelas();
+          registro.pontos = this.obterTotalPontos();
           registro.fasesConcluidas = this.fasesMock.filter(f => f.status === 'concluida').length;
+          registro.progressoPct = Math.min(100, registro.fasesConcluidas * 20);
         }
+
+        this.http.post(`${this.apiUrl}/tentativas`, {
+          alunoId: logado.id,
+          faseId: idFase,
+          estrelas: estrelasObtidas
+        }).pipe(catchError(() => of(null))).subscribe();
       }
     }
   }
 
-  // RF-D07: Listar todos os alunos da sessão (ativos e desativados)
   obterAlunosDaSessao(): AlunoSessao[] {
     return this.alunosSessaoMock;
   }
 
-  // UC 06 / RF-D08 / RN10: Desativar ou reativar aluno preservando histórico
   alternarStatusAluno(id: number): void {
     const aluno = this.alunosSessaoMock.find(a => a.id === id);
     if (aluno) {
       aluno.ativo = !aluno.ativo;
+      this.http.patch(`${this.apiUrl}/alunos/${id}/status`, { ativo: aluno.ativo })
+        .pipe(catchError(() => of(null)))
+        .subscribe();
     }
   }
 
-  // RF-P13 / RF-D12: Gerar ranking ordenado por estrelas dos alunos ativos
   obterRanking(): AlunoSessao[] {
     return [...this.alunosSessaoMock]
       .filter(a => a.ativo)
-      .sort((a, b) => b.estrelasTotal - a.estrelasTotal);
+      .sort((a, b) => b.pontos - a.pontos);
   }
 }

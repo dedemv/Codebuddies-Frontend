@@ -1,91 +1,99 @@
-<div class="painel-container">
-  <header class="topo-painel">
-    <div>
-      <h1>📋 Painel do Docente - CodeBuddies</h1>
-      <p>Instituição Parceira: AMPLA - Platina/SP</p>
-    </div>
-    <div class="acoes-topo">
-      <a routerLink="/entrar" class="btn-link">Ver Tela do Aluno</a>
-      <a routerLink="/ranking" class="btn-link">🏆 Ver Ranking</a>
-    </div>
+<div class="pagina-alunos">
+  <!-- Cabeçalho Magenta Oficial -->
+  <header class="navbar-codebuddies">
+    <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
+    <nav class="nav-links">
+      <a routerLink="/entrar">Início</a>
+      <a routerLink="/professor/painel" class="ativo">Alunos</a>
+      <a routerLink="/mapa">Fases</a>
+      <a routerLink="/perfil">Progressos</a>
+      <a routerLink="/ranking">Ranking</a>
+    </nav>
+    <a routerLink="/professor/relatorio" class="pilula-prof">📊 Relatório Final</a>
   </header>
 
-  <!-- Controle de Sessão (UC 04 e UC 05) -->
-  <section class="card-controle">
-    <div class="status-box">
-      <span>Status da Aula:</span>
-      @if (sessaoAberta) {
-        <span class="badge-aberta">🟢 SESSÃO ABERTA ({{ nomeTurma }})</span>
-      } @else {
-        <span class="badge-fechada">🔴 SESSÃO ENCERRADA</span>
-      }
-    </div>
-
-    @if (!sessaoAberta) {
-      <div class="form-nova-sessao">
-        <input 
-          type="text" 
-          [(ngModel)]="nomeTurma" 
-          placeholder="Nome da Turma (ex: Turma Manhã)" />
-        <button class="btn-abrir" (click)="criarEAbrirSessao()">
-          ▶️ Criar e Abrir Sessão de Aula
-        </button>
-      </div>
-    } @else {
+  <main class="container-alunos">
+    <!-- Cabeçalho da Seção Alunos -->
+    <div class="topo-secao">
       <div>
-        @if (!confirmandoEncerramento) {
-          <button class="btn-encerrar" (click)="confirmandoEncerramento = true">
-            ⏹️ Encerrar Sessão e Gerar Ranking Final
+        <h1>Alunos</h1>
+        <p>Gerencie os alunos da sua turma ({{ nomeTurma }}).</p>
+      </div>
+
+      <div class="botoes-sessao">
+        @if (!sessaoAberta) {
+          <button class="btn-roxo" (click)="criarEAbrirSessao()">
+            ▶️ Abrir Sessão de Aula
           </button>
         } @else {
-          <div class="caixa-confirmacao">
-            <span>Tem certeza que deseja encerrar a sessão e bloquear novos acessos?</span>
-            <button class="btn-confirmar-sim" (click)="confirmarEncerramento()">Sim, Encerrar</button>
-            <button class="btn-confirmar-nao" (click)="confirmandoEncerramento = false">Cancelar</button>
-          </div>
+          @if (!confirmandoEncerramento) {
+            <button class="btn-encerrar" (click)="confirmandoEncerramento = true">
+              ⏹️ Encerrar Aula
+            </button>
+          } @else {
+            <button class="btn-confirmar" (click)="confirmarEncerramento()">Confirmar Fim</button>
+            <button class="btn-cancelar" (click)="confirmandoEncerramento = false">Cancelar</button>
+          }
         }
+        <a routerLink="/entrar" class="btn-roxo">+ Novo aluno</a>
       </div>
-    }
-  </section>
+    </div>
 
-  <!-- Lista de Alunos e Métricas (RF-D07, RF-D08, RF-D10, UC 06) -->
-  <section class="card-tabela">
-    <h2>👧👦 Alunos na Sessão e Métricas de Desempenho</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Aluno</th>
-          <th>Idade</th>
-          <th>Nível</th>
-          <th>Fases Concluídas</th>
-          <th>Total de Estrelas</th>
-          <th>Status</th>
-          <th>Ação (UC 06)</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (a of alunos; track a.id) {
-          <tr [class.linha-desativada]="!a.ativo">
-            <td>{{ a.personagem.icone }} <strong>{{ a.nome }}</strong></td>
-            <td>{{ a.idade }} anos</td>
-            <td>Nível {{ a.nivelAtual }}</td>
-            <td>{{ a.fasesConcluidas }} / 3</td>
-            <td>⭐ {{ a.estrelasTotal }}</td>
-            <td>
-              @if (a.ativo) {
-                <span class="status-ativo">Ativo</span>
-              } @else {
-                <span class="status-inativo">Desativado</span>
-              }
-            </td>
-            <td>
-              <button class="btn-status" (click)="alternarStatus(a.id)">
-                {{ a.ativo ? '🚫 Desativar' : '✅ Reativar' }}
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </section>
+    <!-- Barra de Busca e Filtro (Idêntico ao Protótipo) -->
+    <div class="barra-filtros">
+      <div class="input-busca">
+        <span>🔍</span>
+        <input 
+          type="text" 
+          [(ngModel)]="termoBusca" 
+          placeholder="Buscar aluno..." />
+      </div>
+
+      <select [(ngModel)]="filtroStatus" class="select-filtro">
+        <option value="todos">Todos</option>
+        <option value="ativos">Ativos</option>
+        <option value="inativos">Desativados</option>
+      </select>
+    </div>
+
+    <!-- Lista de Cards de Alunos com Barra de Progresso -->
+    <div class="lista-cards-alunos">
+      @for (a of alunosFiltrados; track a.id) {
+        <div class="card-aluno-item" [class.inativo]="!a.ativo">
+          <!-- Esquerda: Avatar + Nome + Idade + Tag -->
+          <div class="info-esquerda">
+            <div class="avatar-aluno" [style.background]="a.personagem.corFundo">
+              {{ a.personagem.icone }}
+            </div>
+            <div>
+              <h3>{{ a.nome }}</h3>
+              <span class="idade-aluno">{{ a.idade }} anos</span>
+              <span class="tag-cargo">⚙️ {{ a.cargoNivel }}</span>
+            </div>
+          </div>
+
+          <!-- Centro: Estrelas + Barra de Progresso + % -->
+          <div class="progresso-centro">
+            <div class="estrelas-mini">
+              ★★★★<span class="apagada">★</span>
+            </div>
+            <div class="linha-barra-pct">
+              <div class="trilho-aluno">
+                <div class="preenchimento-aluno" [style.width.%]="a.progressoPct"></div>
+              </div>
+              <strong class="pct-texto">{{ a.progressoPct }}%</strong>
+            </div>
+          </div>
+
+          <!-- Direita: Botões Ver > e Desativar (UC 06) -->
+          <div class="acoes-direita">
+            <button class="btn-status-toggle" (click)="alternarStatus(a.id)">
+              {{ a.ativo ? '🚫 Desativar' : '✅ Reativar' }}
+            </button>
+            <a routerLink="/perfil" class="btn-ver">Ver &gt;</a>
+          </div>
+        </div>
+      }
+    </div>
+  </main>
 </div>
