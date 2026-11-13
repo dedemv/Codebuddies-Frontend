@@ -20,6 +20,8 @@ export interface Personagem {
   id: string;
   nome: string;
   icone: string;
+  posX: string; // Posição horizontal na imagem
+  posY: string; // Posição vertical na imagem
   corFundo: string;
   fala: string;
   estrelasNecessarias: number;
@@ -51,12 +53,12 @@ export class Sessao {
 
   // Os 6 Personagens oficiais do Design do Grupo
   public personagens: Personagem[] = [
-    { id: 'white-dog', nome: 'White Dog', icone: '🐻‍❄️', corFundo: '#e3f2fd', fala: 'Vamos dar os primeiros passos!', estrelasNecessarias: 0 },
-    { id: 'pig', nome: 'Pig', icone: '🐷', corFundo: '#fce4ec', fala: 'Programar é muito divertido!', estrelasNecessarias: 0 },
-    { id: 'green-dog', nome: 'Green Dog', icone: '🐸', corFundo: '#e8f5e9', fala: 'Coloque o fone e vamos codar!', estrelasNecessarias: 0 },
-    { id: 'puppy', nome: 'Puppy', icone: '🐶', corFundo: '#fff9c4', fala: 'Qual é o próximo comando?', estrelasNecessarias: 3 },
-    { id: 'duck', nome: 'Space Duck', icone: '🐦', corFundo: '#e1f5fe', fala: 'Explorando o universo dos códigos!', estrelasNecessarias: 5 },
-    { id: 'fox', nome: 'Fox', icone: '🦊', corFundo: '#fff3e0', fala: 'Você já domina as funções!', estrelasNecessarias: 8 }
+    { id: 'white-dog', nome: 'White Dog', icone: '🐻‍❄️', posX: '0%',   posY: '0%',   corFundo: '#e3f2fd', fala: 'Vamos dar os primeiros passos!', estrelasNecessarias: 0 },
+    { id: 'pig',       nome: 'Pig',       icone: '🐷',   posX: '50%',  posY: '0%',   corFundo: '#fce4ec', fala: 'Programar é muito divertido!', estrelasNecessarias: 0 },
+    { id: 'green-dog', nome: 'Green Dog', icone: '🐸',   posX: '100%', posY: '0%',   corFundo: '#e8f5e9', fala: 'Coloque o fone e vamos codar!', estrelasNecessarias: 0 },
+    { id: 'puppy',     nome: 'Puppy',     icone: '🐶',   posX: '0%',   posY: '100%', corFundo: '#fff9c4', fala: 'Qual é o próximo comando?', estrelasNecessarias: 3 },
+    { id: 'duck',      nome: 'Space Duck',icone: '🐦',   posX: '50%',  posY: '100%', corFundo: '#e1f5fe', fala: 'Explorando o universo dos códigos!', estrelasNecessarias: 5 },
+    { id: 'fox',       nome: 'Fox',       icone: '🦊',   posX: '100%', posY: '100%', corFundo: '#fff3e0', fala: 'Você já domina as funções!', estrelasNecessarias: 8 }
   ];
 
   // As 5 Fases do Design ("Fases do Jogo")
@@ -263,3 +265,4 @@ export class Sessao {
       .sort((a, b) => b.pontos - a.pontos);
   }
 }
+

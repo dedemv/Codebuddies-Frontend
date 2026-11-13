@@ -1,7 +1,19 @@
-<div class="tela-personagem">
-  <div class="container">
+<div class="pagina-personagens">
+  <header class="navbar-codebuddies">
+    <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
+    <nav class="nav-links">
+      <a routerLink="/entrar">Início</a>
+      <a routerLink="/professor/painel">Alunos</a>
+      <a routerLink="/mapa">Fases</a>
+      <a routerLink="/perfil">Progressos</a>
+      <a routerLink="/ranking">Ranking</a>
+    </nav>
+    <a routerLink="/mapa" class="pilula-voltar">🗺️ Ir ao Mapa</a>
+  </header>
+
+  <main class="container-personagens">
     <h1>Escolha seu Amigo de Aventura! 🌟</h1>
-    <p class="subtitulo">Você tem ⭐ {{ totalEstrelas }} estrelas para desbloquear personagens</p>
+    <p class="subtitulo">Você tem <strong>⭐ {{ totalEstrelas }} estrelas</strong> para desbloquear personagens</p>
 
     <div class="grade-personagens">
       @for (p of personagens; track p.id) {
@@ -11,12 +23,20 @@
           [class.bloqueado]="totalEstrelas < p.estrelasNecessarias"
           (click)="escolher(p)">
           
-          <div class="icone-grande">{{ p.icone }}</div>
+          <div class="palco-personagem" [style.background]="p.corFundo">
+            <div 
+              class="sprite-personagem"
+              [style.background-position]="p.posX + ' ' + p.posY">
+            </div>
+          </div>
+
           <h3>{{ p.nome }}</h3>
           <p class="fala">"{{ p.fala }}"</p>
 
           @if (totalEstrelas < p.estrelasNecessarias) {
             <span class="badge-bloqueado">🔒 Precisa de ⭐ {{ p.estrelasNecessarias }}</span>
+          } @else if (selecionado?.id === p.id) {
+            <span class="badge-selecionado">🌟 Escolhido!</span>
           } @else {
             <span class="badge-liberado">✅ Disponível</span>
           }
@@ -24,6 +44,8 @@
       }
     </div>
 
-    <button class="btn-confirmar" (click)="confirmar()">IR PARA O MAPA DE FASES 🗺️</button>
-  </div>
+    <button class="btn-confirmar" (click)="confirmar()">
+      Confirmar e Jogar ➔
+    </button>
+  </main>
 </div>
