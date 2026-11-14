@@ -11,6 +11,9 @@ export interface Fase {
   etapaNome: string;
   corCard: string;
   mascoteIcone: string;
+  posX: string;
+  posY: string;
+  videoClasse: string; // <-- Posição do quadro no vídeo 3x2
   tipo: 'digitacao' | 'logica' | 'mouse';
   status: 'liberada' | 'bloqueada' | 'concluida';
   estrelas: number;
@@ -41,6 +44,8 @@ export interface AlunoSessao {
   ativo: boolean;
 }
 
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -63,11 +68,11 @@ export class Sessao {
 
   // As 5 Fases do Design ("Fases do Jogo")
   private fasesMock: Fase[] = [
-    { id: 1, nivel: 1, subtitulo: 'FASE 01', titulo: 'Primeiros passos', etapaNome: 'Iniciante', corCard: 'verde', mascoteIcone: '🐻‍❄️', tipo: 'digitacao', status: 'liberada', estrelas: 4 },
-    { id: 2, nivel: 1, subtitulo: 'FASE 02', titulo: 'Comandos', etapaNome: 'Comandos', corCard: 'azul', mascoteIcone: '🐦', tipo: 'mouse', status: 'liberada', estrelas: 2 },
-    { id: 3, nivel: 1, subtitulo: 'FASE 03', titulo: 'Loops', etapaNome: 'Loops', corCard: 'roxo', mascoteIcone: '🐸', tipo: 'logica', status: 'bloqueada', estrelas: 0 },
-    { id: 4, nivel: 1, subtitulo: 'FASE 04', titulo: 'Funções', etapaNome: 'Funções', corCard: 'rosa', mascoteIcone: '🦊', tipo: 'logica', status: 'bloqueada', estrelas: 0 },
-    { id: 5, nivel: 1, subtitulo: 'FASE 05', titulo: 'Projetos Finais', etapaNome: 'Projetos', corCard: 'laranja', mascoteIcone: '🤖', tipo: 'digitacao', status: 'bloqueada', estrelas: 0 }
+    { id: 1, nivel: 1, subtitulo: 'FASE 01', titulo: 'Primeiros passos', etapaNome: 'Iniciante', corCard: 'verde',   mascoteIcone: '🐻‍❄️', posX: '0%',   posY: '0%',   videoClasse: 'vid-pos-1', tipo: 'digitacao', status: 'liberada',  estrelas: 4 },
+    { id: 2, nivel: 1, subtitulo: 'FASE 02', titulo: 'Comandos',         etapaNome: 'Comandos',  corCard: 'azul',    mascoteIcone: '🐦',   posX: '50%',  posY: '100%', videoClasse: 'vid-pos-2', tipo: 'mouse',     status: 'liberada',  estrelas: 2 },
+    { id: 3, nivel: 1, subtitulo: 'FASE 03', titulo: 'Loops',            etapaNome: 'Loops',     corCard: 'roxo',    mascoteIcone: '🐸',   posX: '100%', posY: '0%',   videoClasse: 'vid-pos-3', tipo: 'logica',    status: 'bloqueada', estrelas: 0 },
+    { id: 4, nivel: 1, subtitulo: 'FASE 04', titulo: 'Funções',          etapaNome: 'Funções',   corCard: 'rosa',    mascoteIcone: '🦊',   posX: '100%', posY: '100%', videoClasse: 'vid-pos-4', tipo: 'logica',    status: 'bloqueada', estrelas: 0 },
+    { id: 5, nivel: 1, subtitulo: 'FASE 05', titulo: 'Projetos Finais',  etapaNome: 'Projetos',  corCard: 'laranja', mascoteIcone: '🐶',   posX: '0%',   posY: '100%', videoClasse: 'vid-pos-5', tipo: 'digitacao', status: 'bloqueada', estrelas: 0 }
   ];
 
   private historicoMock: { faseTitulo: string; estrelas: number; data: string }[] = [];

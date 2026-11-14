@@ -12,42 +12,46 @@
     <a routerLink="/professor/painel" class="pilula-prof">👨‍🏫 Professor ⌄</a>
   </header>
 
-  <main class="container-progressos">
+  <main class="container-progressos animar-entrada">
     <!-- Topo com Título e Seletor de Alunos -->
     <div class="cabecalho-secao">
       <div>
-        <h1>Progressos</h1>
-        <p>Acompanhe o desenvolvimento dos alunos.</p>
+        <h1>Progressos 📊</h1>
+        <p>Acompanhe o desenvolvimento e as conquistas na programação.</p>
       </div>
 
       <select class="select-alunos" (change)="aoTrocarFiltro($event)">
-        <option [value]="0">Todos os alunos ({{ alunoLogado?.nome || 'Lucas Silva' }})</option>
+        <option [value]="0">👤 Meu Perfil ({{ alunoLogado?.nome || 'Lucas Silva' }})</option>
         @for (a of alunosTurma; track a.id) {
-          <option [value]="a.id">{{ a.nome }} ({{ a.idade }} anos)</option>
+          <option [value]="a.id">👦 {{ a.nome }} ({{ a.idade }} anos)</option>
         }
       </select>
     </div>
 
-    <!-- Grid Principal: Esquerda (Perfil + Barras) e Direita (Cards Laterais) -->
+    <!-- Grid Principal -->
     <div class="grid-progressos">
       <!-- Coluna Esquerda -->
       <section class="coluna-principal">
-        <!-- Card de Identificação do Aluno -->
+        <!-- Card de Identificação do Aluno com Sprite Real -->
         <div class="card-identificacao">
-          <div class="avatar-circulo">
-            {{ alunoLogado?.personagem?.icone || '🐸' }}
+          <div class="avatar-circulo" [style.background]="alunoLogado?.personagem?.corFundo || '#e8f5e9'">
+            <div 
+              class="sprite-mascote sprite-perfil animar-flutuar"
+              [style.background-position]="(alunoLogado?.personagem?.posX || '100%') + ' ' + (alunoLogado?.personagem?.posY || '0%')">
+            </div>
           </div>
+
           <div class="dados-aluno">
             <h2>{{ alunoLogado?.nome || 'Lucas Silva' }}</h2>
-            <p class="idade-texto">{{ alunoLogado?.idade || 7 }} anos</p>
-            <p class="nivel-texto">Nível: <strong>{{ alunoLogado?.cargoNivel || 'Programador' }}</strong></p>
+            <p class="idade-texto">🎂 {{ alunoLogado?.idade || 7 }} anos</p>
+            <p class="nivel-texto">🏅 Nível: <strong>{{ alunoLogado?.cargoNivel || 'Programador' }}</strong></p>
             <div class="estrelas-douradas">
               ★★★★<span class="estrela-apagada">★</span>
             </div>
           </div>
         </div>
 
-        <!-- Card das 5 Barras de Progresso -->
+        <!-- Card das 5 Barras de Progresso Animadas -->
         <div class="card-barras">
           @for (item of metricasHabilidades; track item.nome) {
             <div class="linha-progresso">
@@ -74,11 +78,11 @@
           <span>Fases concluídas</span>
           <div class="numero-fases">
             <strong>{{ fasesConcluidasCount }} de {{ totalFasesCount }}</strong>
-            <span class="foguete">🚀</span>
+            <span class="foguete animar-flutuar">🚀</span>
           </div>
         </div>
 
-        <!-- Card Motivacional "Continue assim!" -->
+        <!-- Card Motivacional "Continue assim!" com o Mascote Pig -->
         <div class="card-continue-assim">
           <div class="trofeu">🏆</div>
           <h3>Continue assim!</h3>
@@ -86,8 +90,16 @@
             Você está indo muito bem.<br />
             Cada desafio te deixa mais forte!
           </p>
-          <div class="mascote-pig">🐷</div>
-          <a routerLink="/personagem" class="btn-trocar-mascote">Trocar Mascote</a>
+
+          <!-- Mascote Pig recortado da imagem -->
+          <div class="palco-pig animar-flutuar">
+            <div class="sprite-mascote sprite-pig" style="background-position: 50% 0%;"></div>
+          </div>
+
+          <div class="botoes-perfil-lateral">
+            <a routerLink="/personagem" class="btn-3d-rosa">🎭 Trocar Mascote</a>
+            <a routerLink="/mapa" class="btn-3d-amarelo">🗺️ Jogar Fases</a>
+          </div>
         </div>
       </aside>
     </div>

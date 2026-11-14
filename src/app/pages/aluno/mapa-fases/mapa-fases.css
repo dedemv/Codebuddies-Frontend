@@ -1,7 +1,6 @@
 .pagina-fases {
   min-height: 100vh;
   background-color: #f5f7fb;
-  font-family: 'Segoe UI', sans-serif;
   padding-bottom: 60px;
 }
 
@@ -12,39 +11,77 @@
   justify-content: space-between;
   align-items: center;
   color: white;
+  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.2);
 }
 
 .logo { font-size: 24px; font-weight: 900; }
 .logo .amarelo { color: #ffd600; }
 .nav-links { display: flex; gap: 25px; }
-.nav-links a { color: white; text-decoration: none; font-weight: 600; opacity: 0.85; padding-bottom: 5px; }
-.nav-links a.ativo { opacity: 1; border-bottom: 3px solid white; }
+.nav-links a { color: white; text-decoration: none; font-weight: 600; opacity: 0.85; padding-bottom: 5px; transition: opacity 0.2s; }
+.nav-links a:hover, .nav-links a.ativo { opacity: 1; border-bottom: 3px solid white; }
 
 .pilula-usuario {
   background: white;
   color: #333;
   text-decoration: none;
-  padding: 8px 18px;
+  padding: 6px 16px 6px 8px;
   border-radius: 30px;
   font-weight: bold;
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  transition: transform 0.15s;
+}
+
+.pilula-usuario:hover { transform: scale(1.04); }
+
+.mini-avatar-nav {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fce4ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.mini-avatar-nav .sprite-mascote {
+  width: 32px;
+  height: 32px;
 }
 
 .banner-fases {
-  background: linear-gradient(135deg, #e91e63 0%, #d81b60 100%);
+  background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
   color: white;
-  padding: 30px 60px 60px;
+  padding: 30px 60px 65px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.banner-fases h1 { margin: 0 0 8px; font-size: 34px; }
-.mascote-banner { font-size: 70px; }
+.banner-fases h1 { margin: 0 0 8px; font-size: 34px; font-weight: 800; }
+.banner-fases p { margin: 0; font-size: 17px; opacity: 0.95; }
+
+.circulo-mascote-banner {
+  width: 95px;
+  height: 95px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.sprite-banner {
+  width: 82px;
+  height: 82px;
+}
 
 .container-fases {
-  max-width: 1050px;
+  max-width: 1080px;
   margin: -35px auto 0;
   background: white;
   border-radius: 30px;
@@ -70,87 +107,96 @@
 }
 
 .circulo-step {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: #cfd8dc;
   color: white;
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s;
 }
 
-.step-concluido { background: #ffd600; color: #333; }
-.step-atual { background: #d81b60; color: white; }
-.step-liberado { background: #29b6f6; color: white; }
-.step-label { font-size: 14px; font-weight: bold; color: #455a64; }
+.step-liberado { background: #29b6f6; }
+.step-concluido { background: #ffd600; color: #212121; box-shadow: 0 4px 10px rgba(255, 214, 0, 0.4); }
+.step-atual { background: #d81b60; color: white; animation: pulsar 2s infinite; }
+.step-label { font-size: 14px; font-weight: 700; color: #455a64; }
 
 /* Grade de Cards */
 .grade-cards-fases {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 25px;
 }
 
 .card-fase-colorido {
-  border-radius: 24px;
-  padding: 25px;
+  border-radius: 26px;
+  padding: 24px;
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Cores exatas do protótipo */
+.card-fase-colorido:hover:not(.card-bloqueado) {
+  transform: translateY(-7px);
+  box-shadow: 0 16px 30px rgba(0,0,0,0.16);
+}
+
 .cor-verde { background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%); }
 .cor-azul { background: linear-gradient(135deg, #29b6f6 0%, #0288d1 100%); }
 .cor-roxo { background: linear-gradient(135deg, #ab47bc 0%, #7b1fa2 100%); }
 .cor-rosa { background: linear-gradient(135deg, #ec407a 0%, #c2185b 100%); }
 .cor-laranja { background: linear-gradient(135deg, #ffa726 0%, #ef6c00 100%); }
 
+/* Palco Branco para o Sprite aparecer sem fundo */
 .ilustracao-card {
-  font-size: 65px;
-  text-align: center;
-  background: rgba(255,255,255,0.2);
-  border-radius: 18px;
-  padding: 15px 0;
-  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 20px;
+  height: 125px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
 }
 
-.subtitulo-fase { font-size: 12px; opacity: 0.9; font-weight: bold; }
+.sprite-card {
+  width: 105px;
+  height: 105px;
+}
+
+.subtitulo-fase { font-size: 12px; opacity: 0.9; font-weight: 800; letter-spacing: 1px; }
 .linha-titulo { display: flex; justify-content: space-between; align-items: center; }
-.linha-titulo h3 { margin: 5px 0 10px; font-size: 22px; }
+.linha-titulo h3 { margin: 4px 0 10px; font-size: 22px; font-weight: 800; }
+.icone-cadeado { font-size: 22px; }
 
-.estrelas-card { font-size: 20px; margin-bottom: 15px; color: rgba(255,255,255,0.35); }
-.estrelas-card .acesa { color: #ffd600; }
+.estrelas-card { font-size: 24px; margin-bottom: 16px; color: rgba(255,255,255,0.35); display: flex; gap: 4px; }
+.estrela-icone.acesa { color: #ffd600; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-.btn-jogar-amarelo {
+.btn-largura-total {
   width: 100%;
-  background: #ffd600;
-  color: #212121;
-  font-weight: 800;
-  font-size: 16px;
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
-  cursor: pointer;
 }
 
 .btn-bloqueada {
-  margin-top: 20px;
-  background: rgba(255,255,255,0.25);
+  margin-top: 22px;
+  background: rgba(0, 0, 0, 0.22);
   text-align: center;
-  padding: 12px;
+  padding: 13px;
   border-radius: 25px;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 15px;
 }
 
 .card-incentivo {
-  background: #f8f9fa;
-  border-radius: 24px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8eaf6 100%);
+  border: 3px dashed #c5cae9;
+  border-radius: 26px;
   padding: 30px;
   text-align: center;
   display: flex;
@@ -159,5 +205,40 @@
   align-items: center;
   color: #1a237e;
 }
+/* Moldura que recorta apenas o quadrante correspondente do vídeo */
+.video-moldura {
+  position: relative;
+  overflow: hidden;
+  padding: 0 !important;
+  height: 155px;
+  border-radius: 18px;
+  background: #1e1e2f;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+}
 
-.trofeu-icone { font-size: 54px; margin-bottom: 10px; }
+.moldura-incentivo {
+  width: 100%;
+  margin-bottom: 14px;
+  border-color: #d81b60;
+}
+
+/* O vídeo tem 3 colunas (300% width) e 2 linhas (200% height) */
+.video-sprite {
+  position: absolute;
+  width: 312%;
+  height: 235%;
+  max-width: none;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Coordenadas exatas de cada um dos 6 quadros do vídeo (já ocultando a tarja de título do vídeo) */
+.vid-pos-1 { left: -2%;    top: -16%; } /* Fase 01: White Dog caminhando */
+.vid-pos-2 { left: -106%;  top: -16%; } /* Fase 02: Space Duck digitando */
+.vid-pos-3 { left: -209%;  top: -16%; } /* Fase 03: Green Dog girando no loop */
+.vid-pos-4 { left: -2%;    top: -133%; } /* Fase 04: Fox nas engrenagens/funções */
+.vid-pos-5 { left: -106%;  top: -133%; } /* Fase 05: Puppy segurando o troféu */
+.vid-pos-6 { left: -209%;  top: -133%; } /* Fase 06: Pig comemorando com confetes */
+
+
+.trofeu-icone { font-size: 60px; margin-bottom: 12px; }

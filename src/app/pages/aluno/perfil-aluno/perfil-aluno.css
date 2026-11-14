@@ -1,11 +1,9 @@
 .pagina-progressos {
   min-height: 100vh;
   background-color: #f4f6fb;
-  font-family: 'Segoe UI', sans-serif;
   padding-bottom: 50px;
 }
 
-/* Cabeçalho Magenta */
 .navbar-codebuddies {
   background: linear-gradient(90deg, #d81b60 0%, #ec407a 100%);
   padding: 15px 50px;
@@ -13,6 +11,7 @@
   justify-content: space-between;
   align-items: center;
   color: white;
+  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.2);
 }
 
 .logo { font-size: 24px; font-weight: 900; }
@@ -29,9 +28,9 @@
   border-radius: 30px;
   font-weight: bold;
   font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 
-/* Container Principal */
 .container-progressos {
   max-width: 1050px;
   margin: 30px auto;
@@ -48,117 +47,98 @@
   margin-bottom: 25px;
 }
 
-.cabecalho-secao h1 {
-  color: #1a237e;
-  font-size: 30px;
-  margin: 0 0 4px;
-}
-
-.cabecalho-secao p {
-  color: #78909c;
-  margin: 0;
-}
+.cabecalho-secao h1 { color: #1a237e; font-size: 30px; font-weight: 800; margin: 0 0 4px; }
+.cabecalho-secao p { color: #78909c; margin: 0; }
 
 .select-alunos {
-  padding: 10px 18px;
-  border-radius: 12px;
-  border: 1px solid #cfd8dc;
+  padding: 12px 20px;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
   background: #f8f9fa;
-  font-size: 14px;
-  color: #37474f;
-  font-weight: 600;
+  font-size: 15px;
+  color: #1a237e;
+  font-weight: 700;
+  cursor: pointer;
   outline: none;
 }
 
-/* Grid de 2 Colunas */
 .grid-progressos {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1.8fr 1fr;
   gap: 25px;
 }
 
 .card-identificacao {
   background: #f8f9fc;
-  border-radius: 22px;
+  border-radius: 24px;
   padding: 25px;
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 24px;
   margin-bottom: 20px;
+  border: 2px solid #edf2f7;
 }
 
 .avatar-circulo {
-  width: 90px;
-  height: 90px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ec407a 0%, #ab47bc 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 52px;
-  box-shadow: 0 6px 15px rgba(236, 64, 122, 0.3);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  border: 4px solid white;
+  overflow: hidden;
 }
 
-.dados-aluno h2 {
-  margin: 0;
-  color: #1a237e;
-  font-size: 22px;
+.sprite-perfil {
+  width: 96px;
+  height: 96px;
 }
 
-.idade-texto, .nivel-texto {
-  margin: 3px 0;
-  color: #607d8b;
-  font-size: 14px;
-}
-
-.estrelas-douradas {
-  color: #ffc107;
-  font-size: 20px;
-  letter-spacing: 2px;
-  margin-top: 6px;
-}
-
-.estrela-apagada {
-  color: #cfd8dc;
-}
+.dados-aluno h2 { margin: 0 0 4px; color: #1a237e; font-size: 24px; font-weight: 800; }
+.idade-texto, .nivel-texto { margin: 4px 0; color: #546e7a; font-size: 15px; }
+.estrelas-douradas { color: #ffc107; font-size: 22px; letter-spacing: 3px; margin-top: 6px; }
+.estrela-apagada { color: #cfd8dc; }
 
 /* Barras de Progresso */
 .card-barras {
   background: #f8f9fc;
-  border-radius: 22px;
-  padding: 25px;
+  border-radius: 24px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
+  border: 2px solid #edf2f7;
 }
 
 .topo-barra {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: #37474f;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .trilho-barra {
   width: 100%;
-  height: 12px;
+  height: 14px;
   background: #e2e8f0;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
 .preenchimento-barra {
   height: 100%;
-  border-radius: 10px;
-  transition: width 0.4s ease;
+  border-radius: 12px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .preenchimento-barra.azul { background: linear-gradient(90deg, #42a5f5, #5c6bc0); }
 .preenchimento-barra.roxo-claro { background: linear-gradient(90deg, #7e57c2, #ab47bc); }
 .preenchimento-barra.azul-forte { background: linear-gradient(90deg, #5c6bc0, #3949ab); }
-.preenchimento-barra.roxo { background: linear-gradient(90deg, #8e24aa, #ab47bc); }
+.preenchimento-barra.roxo { background: linear-gradient(90deg, #8e24aa, #ec407a); }
 .preenchimento-barra.lilás { background: linear-gradient(90deg, #9575cd, #b39ddb); }
 
 /* Coluna Lateral */
@@ -170,51 +150,61 @@
 
 .card-fases-concluidas {
   background: #f8f9fc;
-  border-radius: 22px;
-  padding: 22px;
+  border-radius: 24px;
+  padding: 24px;
   text-align: center;
   color: #607d8b;
-  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid #edf2f7;
 }
 
 .numero-fases {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-top: 8px;
 }
 
-.numero-fases strong {
-  font-size: 28px;
-  color: #1a237e;
-}
-
-.foguete { font-size: 28px; }
+.numero-fases strong { font-size: 30px; color: #1a237e; font-weight: 800; }
+.foguete { font-size: 32px; display: inline-block; }
 
 .card-continue-assim {
   background: #f8f9fc;
-  border-radius: 22px;
-  padding: 25px;
+  border-radius: 24px;
+  padding: 28px 22px;
   text-align: center;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border: 2px solid #edf2f7;
 }
 
-.trofeu { font-size: 44px; margin-bottom: 8px; }
-.card-continue-assim h3 { color: #1a237e; margin: 0 0 8px; }
-.card-continue-assim p { color: #607d8b; font-size: 14px; line-height: 1.5; margin-bottom: 15px; }
-.mascote-pig { font-size: 68px; margin-bottom: 12px; }
+.trofeu { font-size: 42px; margin-bottom: 6px; }
+.card-continue-assim h3 { color: #1a237e; font-size: 22px; margin: 0 0 8px; }
+.card-continue-assim p { color: #607d8b; font-size: 14px; line-height: 1.5; margin-bottom: 16px; }
 
-.btn-trocar-mascote {
-  text-decoration: none;
-  background: #ec407a;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 14px;
+.palco-pig {
+  width: 115px;
+  height: 115px;
+  border-radius: 50%;
+  background: #fce4ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.sprite-pig {
+  width: 100px;
+  height: 100px;
+}
+
+.botoes-perfil-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
