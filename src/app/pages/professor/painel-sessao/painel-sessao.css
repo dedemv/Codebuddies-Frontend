@@ -256,3 +256,65 @@
   font-weight: bold;
   font-size: 13px;
 }
+.btn-abrir-aula {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-novo-aluno {
+  background: white;
+  padding: 30px;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.modal-novo-aluno h2 {
+  margin: 0 0 6px;
+  color: #1a237e;
+}
+
+.modal-novo-aluno label {
+  display: block;
+  font-weight: 700;
+  margin: 14px 0 6px;
+  color: #334155;
+}
+
+.modal-novo-aluno input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.erro-modal {
+  color: #d32f2f;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.acoes-modal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+}

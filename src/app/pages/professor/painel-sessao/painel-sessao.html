@@ -17,29 +17,32 @@
     <div class="topo-secao">
       <div>
         <h1>Alunos</h1>
-        <p>Gerencie os alunos da sua turma ({{ nomeTurma }}).</p>
+        <p>
+          Gerencie os alunos da sua turma ({{ nomeTurma }}) —
+          <strong>{{ sessaoAberta ? '🟢 Aula Aberta' : '🔴 Aula Fechada' }}</strong>
+        </p>
       </div>
 
       <div class="botoes-sessao">
         @if (!sessaoAberta) {
-          <button class="btn-roxo" (click)="criarEAbrirSessao()">
+          <button type="button" class="btn-abrir-aula" (click)="criarEAbrirSessao()">
             ▶️ Abrir Sessão de Aula
           </button>
         } @else {
           @if (!confirmandoEncerramento) {
-            <button class="btn-encerrar" (click)="confirmandoEncerramento = true">
+            <button type="button" class="btn-encerrar" (click)="confirmandoEncerramento = true">
               ⏹️ Encerrar Aula
             </button>
           } @else {
-            <button class="btn-confirmar" (click)="confirmarEncerramento()">Confirmar Fim</button>
-            <button class="btn-cancelar" (click)="confirmandoEncerramento = false">Cancelar</button>
+            <button type="button" class="btn-confirmar" (click)="confirmarEncerramento()">Confirmar Fim</button>
+            <button type="button" class="btn-cancelar" (click)="confirmandoEncerramento = false">Cancelar</button>
           }
         }
-        <a routerLink="/entrar" class="btn-roxo">+ Novo aluno</a>
+        <button type="button" class="btn-roxo" (click)="abrirModalNovoAluno()">+ Novo aluno</button>
       </div>
     </div>
 
-    <!-- Barra de Busca e Filtro (Idêntico ao Protótipo) -->
+    <!-- Barra de Busca e Filtro -->
     <div class="barra-filtros">
       <div class="input-busca">
         <span>🔍</span>
@@ -60,7 +63,6 @@
     <div class="lista-cards-alunos">
       @for (a of alunosFiltrados; track a.id) {
         <div class="card-aluno-item" [class.inativo]="!a.ativo">
-          <!-- Esquerda: Avatar + Nome + Idade + Tag -->
           <div class="info-esquerda">
             <div class="avatar-aluno" [style.background]="a.personagem.corFundo">
               {{ a.personagem.icone }}
@@ -72,7 +74,6 @@
             </div>
           </div>
 
-          <!-- Centro: Estrelas + Barra de Progresso + % -->
           <div class="progresso-centro">
             <div class="estrelas-mini">
               ★★★★<span class="apagada">★</span>
@@ -85,9 +86,8 @@
             </div>
           </div>
 
-          <!-- Direita: Botões Ver > e Desativar (UC 06) -->
           <div class="acoes-direita">
-            <button class="btn-status-toggle" (click)="alternarStatus(a.id)">
+            <button type="button" class="btn-status-toggle" (click)="alternarStatus(a.id)">
               {{ a.ativo ? '🚫 Desativar' : '✅ Reativar' }}
             </button>
             <a routerLink="/perfil" class="btn-ver">Ver &gt;</a>
@@ -96,4 +96,31 @@
       }
     </div>
   </main>
+
+  <!-- Modal para Cadastrar Novo Aluno sem sair da página -->
+  @if (mostrarModalNovoAluno) {
+    <div class="modal-backdrop" (click)="mostrarModalNovoAluno = false">
+      <div class="modal-novo-aluno" (click)="$event.stopPropagation()">
+        <h2>Cadastrar Novo Aluno 👧👦</h2>
+        <p>Adicione um aluno diretamente na turma atual:</p>
+
+        <form (ngSubmit)="salvarNovoAluno()">
+          <label>Nome do Aluno</label>
+          <input type="text" [(ngModel)]="novoAlunoNome" name="novoAlunoNome" placeholder="Ex: Gabriel" />
+
+          <label>Idade</label>
+          <input type="number" [(ngModel)]="novoAlunoIdade" name="novoAlunoIdade" min="5" max="12" />
+
+          @if (erroNovoAluno) {
+            <p class="erro-modal">{{ erroNovoAluno }}</p>
+          }
+
+          <div class="acoes-modal">
+            <button type="button" class="btn-cancelar" (click)="mostrarModalNovoAluno = false">Cancelar</button>
+            <button type="submit" class="btn-roxo">Salvar Aluno</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 </div>

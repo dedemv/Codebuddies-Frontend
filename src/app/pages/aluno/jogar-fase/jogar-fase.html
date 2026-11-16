@@ -1,83 +1,95 @@
 <div class="tela-jogo">
-  <header class="navbar-codebuddies">
-    <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
-    <div class="titulo-topo">{{ tituloFase }}</div>
-    <a routerLink="/mapa" class="pilula-voltar">← Voltar às Fases</a>
+  <header class="topo-jogo">
+    <button type="button" class="btn-voltar" (click)="voltarAoMapa()">⬅️ Mapa de Fases</button>
+    <h2>{{ tituloFase }}</h2>
+    <div class="placar-tempo-real">
+      <span class="badge-acerto">✅ Acertos: {{ acertosParciais }}</span>
+      <span class="badge-erro">❌ Erros: {{ errosParciais }}</span>
+      <span class="progresso-info">Desafio {{ indiceAtual + 1 }} / {{ desafios.length }}</span>
+    </div>
   </header>
 
   <div class="barra-progresso-container">
     <div class="barra-progresso-preenchimento" [style.width.%]="progressoPct"></div>
   </div>
 
-  @if (erroFase) {
-    <div class="card-resultado">
-      <h2>⚠️ {{ erroFase }}</h2>
-      <a routerLink="/mapa" class="btn-acao btn-menu">Voltar ao Mapa</a>
-    </div>
-  } @else if (!resultadoFinal && desafioAtual) {
-    <div class="card-desafio" [class.borda-acerto]="feedback === 'acerto'">
-      <span class="badge-ordem">Desafio {{ indiceAtual + 1 }} de {{ desafios.length }} ({{ desafioAtual.pontos }} pts)</span>
-      <h2 class="pergunta">{{ desafioAtual.enunciado }}</h2>
-      <p class="dica">Pressione a tecla no teclado ou clique em uma opção abaixo:</p>
+  @if (!resultadoFinal && desafioAtual) {
+    <main
+      class="card-desafio"
+      [class.borda-acerto]="feedback === 'acerto'"
+      [class.borda-erro]="feedback === 'erro'">
+
+      <span class="etiqueta-etapa">{{ faseAtual?.etapaNome }}</span>
+      <p class="pergunta">{{ desafioAtual.enunciado }}</p>
+      <p class="dica">💡 Dica: {{ desafioAtual.dica }}</p>
+
+      @if (faseId === 1) {
+        <div class="tecla-gigante">{{ desafioAtual.alvo }}</div>
+        <p class="instrucao-teclado">⌨️ Pressione a tecla no seu teclado ou clique na letra correta:</p>
+      }
 
       <div class="opcoes-container">
-        @for (op of desafioAtual.opcoes; track op) {
-          <button class="btn-opcao" (click)="responder(op)">{{ op }}</button>
+        @for (opcao of desafioAtual.opcoes; track opcao) {
+          <button
+            type="button"
+            class="btn-opcao"
+            [class.opcao-correta]="feedback && opcao === desafioAtual.alvo"
+            [class.opcao-errada]="feedback === 'erro' && opcao === respostaSelecionada"
+            (click)="responder(opcao)">
+            {{ opcao }}
+          </button>
         }
       </div>
 
-      @if (feedback === 'acerto') {
-        <div class="banner-feedback fundo-acerto">
-          ✨ Resposta registrada: {{ respostaSelecionada }}!
+      @if (feedback) {
+        <div
+          class="banner-feedback"
+          [class.fundo-acerto]="feedback === 'acerto'"
+          [class.fundo-erro]="feedback === 'erro'">
+          {{ mensagemFeedback }}
         </div>
       }
-    </div>
-  } @else if (resultadoFinal) {
-    <div class="card-resultado">
-      <div class="icone-resultado">{{ resultadoFinal.aprovada ? '🎉' : '💪' }}</div>
-      <h2>{{ resultadoFinal.aprovada ? 'Parabéns! Fase Concluída!' : 'Tente de novo!' }}</h2>
+    </main>
+  }
 
-      @if (resultadoFinal.novoRecorde) {
-        <span class="badge-recorde">🏆 Novo recorde!</span>
+  @if (resultadoFinal) {
+    <div class="card-resultado" [class.sucesso]="resultadoFinal.aprovada" [class.derrota]="!resultadoFinal.aprovada">
+      @if (resultadoFinal.aprovada) {
+        <div class="icone-resultado">🏆</div>
+        <h1>Parabéns! Fase Concluída!</h1>
+        <p>Você mandou muito bem e liberou o próximo desafio!</p>
+      } @else {
+        <div class="icone-resultado">💪</div>
+        <h1>Quase lá! Vamos tentar de novo?</h1>
+        <p>Você precisa de pelo menos 3 estrelas para desbloquear a próxima fase.</p>
       }
 
       <div class="estrelas-resultado">
-        @for (e of [1, 2, 3, 4, 5]; track e) {
-          <span [class.estrela-ganha]="e <= resultadoFinal.estrelas">★</span>
+        @for (estrela of [1, 2, 3, 4, 5]; track estrela) {
+          <span class="estrela-item" [class.estrela-ganha]="estrela <= resultadoFinal.estrelas">⭐</span>
         }
       </div>
 
-      <p class="placar-final">
-        Pontos: <strong>{{ resultadoFinal.pontos }}</strong> | Acertos: <strong>{{ resultadoFinal.acertos }}</strong>
-      </p>
-
-      <!-- Lista de ✓/✗ por desafio conforme Seção 3.4 do GUIA_FRONT.md -->
-      @if (resultadoFinal.desafios?.length) {
-        <div class="resumo-desafios">
-          @for (d of resultadoFinal.desafios; track d.desafioId) {
-            <span class="chip-desafio" [class.ok]="d.acertou" [class.err]="!d.acertou">
-              Desafio {{ d.ordem }}: {{ d.acertou ? '✓' : '✗' }}
-            </span>
-          }
-        </div>
-      }
-
-      <!-- Medalhas / Novas Conquistas -->
-      @if (resultadoFinal.novasConquistas?.length) {
-        <div class="caixa-conquista">
-          <h3>🎉 Você ganhou uma medalha!</h3>
-          @for (c of resultadoFinal.novasConquistas; track c.codigo) {
-            <p>{{ c.icone }} <strong>{{ c.titulo }}</strong> — {{ c.descricao }}</p>
-          }
-        </div>
-      }
+      <div class="resumo-numeros">
+        <span class="resumo-ok">✅ {{ resultadoFinal.acertos }} Acertos</span>
+        <span class="resumo-err">❌ {{ resultadoFinal.erros }} Erros</span>
+        <span class="resumo-pts">🏅 {{ resultadoFinal.pontos }} Pontos</span>
+      </div>
 
       <div class="botoes-resultado">
-        @if (resultadoFinal.aprovada && resultadoFinal.proximaFaseId) {
-          <button class="btn-acao btn-avancar" (click)="irProximaFase()">Avançar →</button>
+        <button type="button" class="btn-acao btn-refazer" (click)="refazerFase()">
+          Jogar Novamente 🔄
+        </button>
+
+        @if (resultadoFinal.aprovada && faseId < 5) {
+          <button type="button" class="btn-acao btn-avancar" (click)="irProximaFase()">
+            Avançar para Fase 0{{ faseId + 1 }} 🚀
+          </button>
         }
-        <button class="btn-acao btn-refazer" (click)="iniciarFase()">Jogar de novo</button>
-        <a routerLink="/mapa" class="btn-acao btn-menu">Voltar ao Mapa</a>
+
+        <button type="button" class="btn-acao btn-menu" (click)="voltarAoMapa()">
+          Voltar ao Mapa 🗺️
+        </button>
       </div>
     </div>
   }

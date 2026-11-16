@@ -10,9 +10,14 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenAluno = isBrowser ? sessionStorage.getItem('cb_token_aluno') : null;
   const tokenProf = isBrowser ? sessionStorage.getItem('cb_token_professor') : null;
 
-  const token = req.url.includes('/professor') || req.url.includes('/turmas') || req.url.includes('/relatorios')
-    ? (tokenProf || tokenAluno)
-    : (tokenAluno || tokenProf);
+  const isRotaProfessor =
+    req.url.includes('/professor') ||
+    req.url.includes('/turmas') ||
+    req.url.includes('/sessoes') ||
+    req.url.includes('/alunos') ||
+    req.url.includes('/relatorios');
+
+  const token = isRotaProfessor ? (tokenProf || tokenAluno) : (tokenAluno || tokenProf);
 
   const authReq = token
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
@@ -23,7 +28,11 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
       const code = err?.error?.error?.code;
 
       if (isBrowser) {
-        if (code === 'NAO_AUTENTICADO' || code === 'TOKEN_INVALIDO' || code === 'ALUNO_FORA_DA_SESSAO') {
+        // Só redireciona para /entrar se for uma rota exclusiva do jogo do aluno (/api/jogo/...)
+        if (
+          req.url.includes('/jogo/') &&
+          (code === 'NAO_AUTENTICADO' || code === 'TOKEN_INVALIDO' || code === 'ALUNO_FORA_DA_SESSAO')
+        ) {
           sessionStorage.removeItem('cb_token_aluno');
           router.navigate(['/entrar']);
         } else if (code === 'FASE_BLOQUEADA') {

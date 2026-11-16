@@ -12,13 +12,19 @@ import { Sessao, AlunoSessao } from '../../../core/services/sessao';
   styleUrl: './painel-sessao.css'
 })
 export class PainelSessao implements OnInit {
-  // Começa como false até verificar se realmente existe sessão aberta
   sessaoAberta = false;
   nomeTurma = 'Turma CodeBuddies';
   alunos: AlunoSessao[] = [];
   termoBusca = '';
   filtroStatus = 'todos';
   confirmandoEncerramento = false;
+
+  // Controle do Modal "+ Novo aluno"
+  mostrarModalNovoAluno = false;
+  novoAlunoNome = '';
+  novoAlunoIdade: number | null = 6;
+  erroNovoAluno = '';
+
   private isBrowser: boolean;
 
   constructor(
@@ -58,9 +64,12 @@ export class PainelSessao implements OnInit {
   }
 
   criarEAbrirSessao(): void {
+    this.sessaoAberta = true;
+    this.confirmandoEncerramento = false;
+    this.cdr.detectChanges();
+
     this.sessaoService.abrirSessao(this.nomeTurma).subscribe(() => {
       this.sessaoAberta = true;
-      this.confirmandoEncerramento = false;
       this.cdr.detectChanges();
     });
   }
@@ -77,6 +86,29 @@ export class PainelSessao implements OnInit {
   alternarStatus(id: number): void {
     this.sessaoService.alternarStatusAluno(id);
     this.alunos = this.sessaoService.obterAlunosDaSessao();
+    this.cdr.detectChanges();
+  }
+
+  abrirModalNovoAluno(): void {
+    this.novoAlunoNome = '';
+    this.novoAlunoIdade = 6;
+    this.erroNovoAluno = '';
+    this.mostrarModalNovoAluno = true;
+  }
+
+  salvarNovoAluno(): void {
+    if (!this.novoAlunoNome || this.novoAlunoNome.trim() === '') {
+      this.erroNovoAluno = 'Digite o nome do aluno';
+      return;
+    }
+    if (!this.novoAlunoIdade || this.novoAlunoIdade < 4 || this.novoAlunoIdade > 14) {
+      this.erroNovoAluno = 'Digite uma idade válida (5 a 12 anos)';
+      return;
+    }
+
+    this.sessaoService.adicionarNovoAluno(this.novoAlunoNome, this.novoAlunoIdade);
+    this.alunos = this.sessaoService.obterAlunosDaSessao();
+    this.mostrarModalNovoAluno = false;
     this.cdr.detectChanges();
   }
 }

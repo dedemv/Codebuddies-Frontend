@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Sessao } from '../../../core/services/sessao';
+import { Sessao, Fase, DesafioJogo } from '../../../core/services/sessao';
 
 @Component({
   selector: 'app-jogar-fase',
@@ -12,13 +12,18 @@ import { Sessao } from '../../../core/services/sessao';
 })
 export class JogarFase implements OnInit {
   faseId = 1;
+  faseAtual?: Fase;
   tituloFase = '';
-  desafios: any[] = [];
+  desafios: DesafioJogo[] = [];
   indiceAtual = 0;
-  respostasAluno: { desafioId: number; resposta: string }[] = [];
+
+  acertosParciais = 0;
+  errosParciais = 0;
+  respostasAluno: { desafioId: number; resposta: string; acertou: boolean }[] = [];
   inicioTimestamp = 0;
 
   feedback: 'acerto' | 'erro' | null = null;
+  mensagemFeedback = '';
   respostaSelecionada = '';
   resultadoFinal: any = null;
   erroFase = '';
@@ -39,18 +44,21 @@ export class JogarFase implements OnInit {
 
   iniciarFase(): void {
     this.indiceAtual = 0;
+    this.acertosParciais = 0;
+    this.errosParciais = 0;
     this.respostasAluno = [];
     this.resultadoFinal = null;
+    this.feedback = null;
+    this.mensagemFeedback = '';
+    this.respostaSelecionada = '';
     this.erroFase = '';
     this.inicioTimestamp = Date.now();
 
     this.sessaoService.obterFaseComDesafios(this.faseId).subscribe({
       next: (res) => {
-        this.tituloFase = res?.fase?.titulo || `Fase 0${this.faseId}`;
-        this.desafios = (res?.desafios || []).map((d: any) => ({
-          ...d,
-          opcoes: d.opcoes || this.extrairOpcoesDoEnunciado(d.enunciado)
-        }));
+        this.faseAtual = res.fase;
+        this.tituloFase = `${res.fase.subtitulo}: ${res.fase.titulo}`;
+        this.desafios = res.desafios || [];
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -60,56 +68,61 @@ export class JogarFase implements OnInit {
     });
   }
 
-  private extrairOpcoesDoEnunciado(enunciado: string): string[] {
-    const palavras = (enunciado || '').split(' ');
-    const ultima = palavras[palavras.length - 1]?.replace(/[^a-zA-Z]/g, '').toUpperCase();
-    const letraAlvo = ultima ? ultima[0] : 'A';
-    const pool = ['A', 'B', 'C', 'D', 'E', 'G', 'L', 'M', 'P', 'S', 'T'];
-    const opcoes = new Set<string>([letraAlvo]);
-    for (const l of pool) {
-      if (opcoes.size < 4) opcoes.add(l);
-    }
-    return Array.from(opcoes).sort();
-  }
-
-  get desafioAtual(): any {
+  get desafioAtual(): DesafioJogo | undefined {
     return this.desafios[this.indiceAtual];
   }
 
   get progressoPct(): number {
-    return this.desafios.length ? Math.round(((this.indiceAtual) / this.desafios.length) * 100) : 0;
+    return this.desafios.length ? Math.round((this.indiceAtual / this.desafios.length) * 100) : 0;
   }
 
   @HostListener('window:keydown', ['$event'])
   aoPressionarTecla(event: KeyboardEvent): void {
     if (this.resultadoFinal || this.feedback || !this.desafioAtual) return;
-    const tecla = event.key.toUpperCase();
-    if (/^[A-Z0-9]$/.test(tecla)) {
-      this.responder(tecla);
+    if (this.faseId === 1) {
+      const tecla = event.key.toUpperCase();
+      if (/^[A-Z0-9]$/.test(tecla)) {
+        this.responder(tecla);
+      }
     }
   }
 
   responder(valor: string): void {
-    if (this.feedback || !this.desafioAtual) return;
+    if (this.feedback || !this.desafioAtual || this.resultadoFinal) return;
+
     this.respostaSelecionada = valor;
+    const acertou = valor.trim().toUpperCase() === this.desafioAtual.alvo.trim().toUpperCase();
+
+    if (acertou) {
+      this.acertosParciais++;
+      this.feedback = 'acerto';
+      this.mensagemFeedback = '🎉 Muito bem! Você acertou!';
+    } else {
+      this.errosParciais++;
+      this.feedback = 'erro';
+      this.mensagemFeedback = `❌ Ops! A resposta correta era: ${this.desafioAtual.alvo}`;
+    }
+
     this.respostasAluno.push({
       desafioId: this.desafioAtual.id,
-      resposta: valor.toLowerCase()
+      resposta: valor,
+      acertou
     });
 
-    this.feedback = 'acerto';
     this.cdr.detectChanges();
 
     setTimeout(() => {
       this.feedback = null;
+      this.mensagemFeedback = '';
       this.respostaSelecionada = '';
+
       if (this.indiceAtual + 1 < this.desafios.length) {
         this.indiceAtual++;
         this.cdr.detectChanges();
       } else {
         this.finalizarFase();
       }
-    }, 900);
+    }, 1200);
   }
 
   finalizarFase(): void {
@@ -120,11 +133,20 @@ export class JogarFase implements OnInit {
     });
   }
 
+  refazerFase(): void {
+    this.iniciarFase();
+  }
+
   irProximaFase(): void {
-    if (this.resultadoFinal?.proximaFaseId) {
-      this.router.navigate(['/fase', this.resultadoFinal.proximaFaseId]);
+    const proximoId = this.resultadoFinal?.proximaFaseId || (this.faseId < 5 ? this.faseId + 1 : null);
+    if (proximoId && proximoId <= 5) {
+      this.router.navigate(['/fase', proximoId]);
     } else {
       this.router.navigate(['/mapa']);
     }
+  }
+
+  voltarAoMapa(): void {
+    this.router.navigate(['/mapa']);
   }
 }
