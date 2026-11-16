@@ -1,4 +1,5 @@
 <div class="pagina-ranking">
+  <!-- Cabeçalho Magenta Oficial -->
   <header class="navbar-codebuddies">
     <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
     <nav class="nav-links">
@@ -8,54 +9,87 @@
       <a routerLink="/perfil">Progressos</a>
       <a routerLink="/ranking" class="ativo">Ranking</a>
     </nav>
-    <a routerLink="/professor/painel" class="pilula-prof">👨‍🏫 Professor</a>
+    <a routerLink="/professor/painel" class="pilula-prof">👨‍🏫 Professor ⌄</a>
   </header>
 
   <main class="container-ranking">
-    <h2>🏆 Ranking da turma</h2>
+    <div class="cabecalho-ranking">
+      <h1>Ranking</h1>
+      <p>Os melhores da turma!</p>
+    </div>
 
-    @if (sessaoAberta) {
-      <div class="aviso-sessao-aberta">
-        <h3>🤫 O Ranking Final será liberado ao encerrar a aula!</h3>
-        <p>Enquanto a sessão estiver aberta, continue completando as fases para subir sua pontuação.</p>
+    @if (!rankingDisponivel) {
+      <div class="aviso-indisponivel">
+        <span class="icone-segredo">🤫</span>
+        <h2>{{ mensagemIndisponivel }}</h2>
+        <p>Continue completando as fases para ganhar ainda mais estrelas!</p>
       </div>
     } @else {
-      <!-- Top 3 em Faixas Coloridas (Idêntico ao ranking.jpeg) -->
-      <div class="podio-faixas">
-        @for (aluno of ranking.slice(0, 3); track aluno.id; let i = $index) {
-          <div 
-            class="faixa-podio"
-            [class.ouro]="i === 0"
-            [class.prata]="i === 1"
-            [class.bronze]="i === 2">
-            <div class="medalha-num">🏅 {{ i + 1 }}º</div>
-            <div class="nome-podio">{{ aluno.nome }}</div>
-            <div class="pontos-podio">{{ aluno.pontos }} pontos</div>
+      <!-- Pódio Top 3 Idêntico à imagem telas principais.jpeg -->
+      <div class="podio-top3">
+        <!-- 2º Lugar (Azul) -->
+        @if (segundo) {
+          <div class="coluna-podio podio-segundo">
+            <div class="avatar-podio">
+              <div class="sprite-mascote" [style.background-position]="segundo.personagem.posX + ' ' + segundo.personagem.posY"></div>
+            </div>
+            <div class="medalha-numero">2</div>
+            <h3>{{ segundo.nome }}</h3>
+            <span class="pontos-podio">{{ segundo.pontos }} pontos</span>
+            <div class="estrelas-podio">★★★★<span class="apagada">★</span></div>
+          </div>
+        }
+
+        <!-- 1º Lugar (Amarelo Ouro + Coroa) -->
+        @if (primeiro) {
+          <div class="coluna-podio podio-primeiro">
+            <div class="coroa">👑</div>
+            <div class="avatar-podio avatar-ouro">
+              <div class="sprite-mascote" [style.background-position]="primeiro.personagem.posX + ' ' + primeiro.personagem.posY"></div>
+            </div>
+            <div class="medalha-numero ouro">1</div>
+            <h3>{{ primeiro.nome }}</h3>
+            <span class="pontos-podio">{{ primeiro.pontos }} pontos</span>
             <div class="estrelas-podio">★★★★★</div>
+          </div>
+        }
+
+        <!-- 3º Lugar (Rosa) -->
+        @if (terceiro) {
+          <div class="coluna-podio podio-terceiro">
+            <div class="avatar-podio">
+              <div class="sprite-mascote" [style.background-position]="terceiro.personagem.posX + ' ' + terceiro.personagem.posY"></div>
+            </div>
+            <div class="medalha-numero">3</div>
+            <h3>{{ terceiro.nome }}</h3>
+            <span class="pontos-podio">{{ terceiro.pontos }} pontos</span>
+            <div class="estrelas-podio">★★★★<span class="apagada">★</span></div>
           </div>
         }
       </div>
 
-      <!-- Demais Colocados (4º em diante em Cards Brancos) -->
+      <!-- 4º e 5º Lugares em Linhas Horizontais -->
       <div class="lista-demais">
-        @for (aluno of ranking.slice(3); track aluno.id; let i = $index) {
-          <div class="linha-colocado">
-            <div class="esquerda-colocado">
-              <span class="pos-num">{{ i + 4 }}º</span>
-              <span class="inicial-avatar">{{ aluno.personagem.icone }}</span>
+        @for (aluno of demais; track aluno.id; let i = $index) {
+          <div class="linha-ranking">
+            <div class="pos-esquerda">
+              <span class="num-pos">{{ i + 4 }}</span>
+              <div class="avatar-mini" [style.background]="aluno.personagem.corFundo">
+                <div class="sprite-mascote" [style.background-position]="aluno.personagem.posX + ' ' + aluno.personagem.posY"></div>
+              </div>
               <strong>{{ aluno.nome }}</strong>
             </div>
-            <div class="direita-colocado">
-              <span class="estrelas-pequenas">★★★☆☆</span>
-              <strong class="pts-roxo">{{ aluno.pontos }} pts</strong>
+
+            <div class="estrelas-centro">
+              ★★★★<span class="apagada">★</span>
+            </div>
+
+            <div class="pontos-direita">
+              <strong>{{ aluno.pontos }} pontos</strong>
             </div>
           </div>
         }
       </div>
     }
-
-    <footer class="rodape-codebuddies">
-      CodeBuddies 👾 — uma plataforma divertida para aprender programação.
-    </footer>
   </main>
 </div>

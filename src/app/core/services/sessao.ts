@@ -3,271 +3,368 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
-export interface Fase {
-  id: number;
-  nivel: number;
-  subtitulo: string;
-  titulo: string;
-  etapaNome: string;
-  corCard: string;
-  mascoteIcone: string;
-  posX: string;
-  posY: string;
-  videoClasse: string; // <-- Posição do quadro no vídeo 3x2
-  tipo: 'digitacao' | 'logica' | 'mouse';
-  status: 'liberada' | 'bloqueada' | 'concluida';
-  estrelas: number;
-}
-
 export interface Personagem {
   id: string;
   nome: string;
   icone: string;
-  posX: string; // Posição horizontal na imagem
-  posY: string; // Posição vertical na imagem
+  posX: string;
+  posY: string;
   corFundo: string;
   fala: string;
   estrelasNecessarias: number;
+}
+
+export interface FaseMapa {
+  faseId: number;
+  id: number;
+  subtitulo: string;
+  titulo: string;
+  etapaNome: string;
+  tipo: 'DIGITACAO' | 'LOGICA' | 'MOUSE';
+  nivelId: number;
+  nivelOrdem: number;
+  nivelTitulo: string;
+  ordem: number;
+  status: 'LIBERADA' | 'BLOQUEADA' | 'CONCLUIDA';
+  melhorEstrelas: number;
+  corCard: 'verde' | 'azul' | 'roxo' | 'rosa' | 'laranja';
+  posX: string;
+  posY: string;
 }
 
 export interface AlunoSessao {
   id: number;
   nome: string;
   idade: number;
-  cargoNivel: string;
-  progressoPct: number;
-  personagem: Personagem;
   nivelAtual: number;
+  cargoNivel: string;
   estrelasTotal: number;
   pontos: number;
   fasesConcluidas: number;
+  progressoPct: number;
   ativo: boolean;
+  personagem: Personagem;
 }
-
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class Sessao {
-  private apiUrl = 'http://localhost:3333/api';
+  // Endereço oficial do GUIA_FRONT.md (Seção 1)
+  public readonly apiUrl = 'http://localhost:3333/api';
 
-  public sessaoAbertaMock = true;
-  public nomeTurmaAtual = 'Turma AMPLA - Platina';
-  public sessaoIdAtual: string | number = 1;
-
-  // Os 6 Personagens oficiais do Design do Grupo
   public personagens: Personagem[] = [
-    { id: 'white-dog', nome: 'White Dog', icone: '🐻‍❄️', posX: '0%',   posY: '0%',   corFundo: '#e3f2fd', fala: 'Vamos dar os primeiros passos!', estrelasNecessarias: 0 },
-    { id: 'pig',       nome: 'Pig',       icone: '🐷',   posX: '50%',  posY: '0%',   corFundo: '#fce4ec', fala: 'Programar é muito divertido!', estrelasNecessarias: 0 },
-    { id: 'green-dog', nome: 'Green Dog', icone: '🐸',   posX: '100%', posY: '0%',   corFundo: '#e8f5e9', fala: 'Coloque o fone e vamos codar!', estrelasNecessarias: 0 },
-    { id: 'puppy',     nome: 'Puppy',     icone: '🐶',   posX: '0%',   posY: '100%', corFundo: '#fff9c4', fala: 'Qual é o próximo comando?', estrelasNecessarias: 3 },
-    { id: 'duck',      nome: 'Space Duck',icone: '🐦',   posX: '50%',  posY: '100%', corFundo: '#e1f5fe', fala: 'Explorando o universo dos códigos!', estrelasNecessarias: 5 },
-    { id: 'fox',       nome: 'Fox',       icone: '🦊',   posX: '100%', posY: '100%', corFundo: '#fff3e0', fala: 'Você já domina as funções!', estrelasNecessarias: 8 }
+    { id: 'white-dog', nome: 'White Dog', icone: '🐻‍❄️', posX: '0%', posY: '0%', corFundo: '#a5d6a7', fala: 'Vamos dar os primeiros passos!', estrelasNecessarias: 0 },
+    { id: 'pig', nome: 'Pig', icone: '🐷', posX: '50%', posY: '0%', corFundo: '#f48fb1', fala: 'Programar é uma grande aventura!', estrelasNecessarias: 0 },
+    { id: 'green-dog', nome: 'Green Dog', icone: '🐸', posX: '100%', posY: '0%', corFundo: '#90caf9', fala: 'Coloque o fone e vamos codar!', estrelasNecessarias: 0 },
+    { id: 'puppy', nome: 'Puppy', icone: '🐶', posX: '0%', posY: '100%', corFundo: '#ffe082', fala: 'Qual é o próximo comando?', estrelasNecessarias: 3 },
+    { id: 'duck', nome: 'Space Duck', icone: '🐦', posX: '50%', posY: '100%', corFundo: '#81d4fa', fala: 'Vamos codar?', estrelasNecessarias: 5 },
+    { id: 'fox', nome: 'Fox', icone: '🦊', posX: '100%', posY: '100%', corFundo: '#ce93d8', fala: 'Você já domina as funções!', estrelasNecessarias: 8 }
   ];
 
-  // As 5 Fases do Design ("Fases do Jogo")
-  private fasesMock: Fase[] = [
-    { id: 1, nivel: 1, subtitulo: 'FASE 01', titulo: 'Primeiros passos', etapaNome: 'Iniciante', corCard: 'verde',   mascoteIcone: '🐻‍❄️', posX: '0%',   posY: '0%',   videoClasse: 'vid-pos-1', tipo: 'digitacao', status: 'liberada',  estrelas: 4 },
-    { id: 2, nivel: 1, subtitulo: 'FASE 02', titulo: 'Comandos',         etapaNome: 'Comandos',  corCard: 'azul',    mascoteIcone: '🐦',   posX: '50%',  posY: '100%', videoClasse: 'vid-pos-2', tipo: 'mouse',     status: 'liberada',  estrelas: 2 },
-    { id: 3, nivel: 1, subtitulo: 'FASE 03', titulo: 'Loops',            etapaNome: 'Loops',     corCard: 'roxo',    mascoteIcone: '🐸',   posX: '100%', posY: '0%',   videoClasse: 'vid-pos-3', tipo: 'logica',    status: 'bloqueada', estrelas: 0 },
-    { id: 4, nivel: 1, subtitulo: 'FASE 04', titulo: 'Funções',          etapaNome: 'Funções',   corCard: 'rosa',    mascoteIcone: '🦊',   posX: '100%', posY: '100%', videoClasse: 'vid-pos-4', tipo: 'logica',    status: 'bloqueada', estrelas: 0 },
-    { id: 5, nivel: 1, subtitulo: 'FASE 05', titulo: 'Projetos Finais',  etapaNome: 'Projetos',  corCard: 'laranja', mascoteIcone: '🐶',   posX: '0%',   posY: '100%', videoClasse: 'vid-pos-5', tipo: 'digitacao', status: 'bloqueada', estrelas: 0 }
+  // Fases exatamente como na tela "Fases do Jogo" (telas principais.jpeg)
+  private fasesPadrao: FaseMapa[] = [
+    { faseId: 1, id: 1, subtitulo: 'FASE 01', titulo: 'Primeiros passos', etapaNome: 'Iniciante', tipo: 'DIGITACAO', nivelId: 1, nivelOrdem: 1, nivelTitulo: 'Iniciante', ordem: 1, status: 'CONCLUIDA', melhorEstrelas: 4, corCard: 'verde', posX: '0%', posY: '0%' },
+    { faseId: 2, id: 2, subtitulo: 'FASE 02', titulo: 'Comandos', etapaNome: 'Comandos', tipo: 'MOUSE', nivelId: 1, nivelOrdem: 2, nivelTitulo: 'Comandos', ordem: 2, status: 'LIBERADA', melhorEstrelas: 2, corCard: 'azul', posX: '50%', posY: '100%' },
+    { faseId: 3, id: 3, subtitulo: 'FASE 03', titulo: 'Loops', etapaNome: 'Loops', tipo: 'LOGICA', nivelId: 1, nivelOrdem: 3, nivelTitulo: 'Loops', ordem: 3, status: 'BLOQUEADA', melhorEstrelas: 0, corCard: 'roxo', posX: '100%', posY: '0%' },
+    { faseId: 4, id: 4, subtitulo: 'FASE 04', titulo: 'Funções', etapaNome: 'Funções', tipo: 'LOGICA', nivelId: 2, nivelOrdem: 4, nivelTitulo: 'Funções', ordem: 4, status: 'BLOQUEADA', melhorEstrelas: 0, corCard: 'rosa', posX: '100%', posY: '100%' },
+    { faseId: 5, id: 5, subtitulo: 'FASE 05', titulo: 'Projetos Finais', etapaNome: 'Projetos', tipo: 'DIGITACAO', nivelId: 2, nivelOrdem: 5, nivelTitulo: 'Projetos', ordem: 5, status: 'BLOQUEADA', melhorEstrelas: 0, corCard: 'laranja', posX: '0%', posY: '100%' }
   ];
 
-  private historicoMock: { faseTitulo: string; estrelas: number; data: string }[] = [];
-
-  // Alunos conforme a tela de Alunos e Ranking do protótipo
-  private alunosSessaoMock: AlunoSessao[] = [
-    { id: 1, nome: 'Ana Clara', idade: 6, cargoNivel: 'Explorador', progressoPct: 80, personagem: this.personagens[3], nivelAtual: 1, estrelasTotal: 5, pontos: 1250, fasesConcluidas: 4, ativo: true },
-    { id: 2, nome: 'Lucas Silva', idade: 7, cargoNivel: 'Programador', progressoPct: 60, personagem: this.personagens[2], nivelAtual: 1, estrelasTotal: 4, pontos: 1120, fasesConcluidas: 3, ativo: true },
-    { id: 3, nome: 'Sofia / Maria Eduarda', idade: 5, cargoNivel: 'Iniciante', progressoPct: 40, personagem: this.personagens[1], nivelAtual: 1, estrelasTotal: 4, pontos: 980, fasesConcluidas: 2, ativo: true },
-    { id: 4, nome: 'Pedro Henrique', idade: 8, cargoNivel: 'Avançado', progressoPct: 90, personagem: this.personagens[5], nivelAtual: 1, estrelasTotal: 3, pontos: 870, fasesConcluidas: 2, ativo: true },
-    { id: 5, nome: 'Juliana Souza', idade: 6, cargoNivel: 'Explorador', progressoPct: 70, personagem: this.personagens[0], nivelAtual: 1, estrelasTotal: 3, pontos: 760, fasesConcluidas: 2, ativo: true }
+  // Alunos exatamente como nas telas "Alunos", "Progressos" e "Ranking" (telas principais.jpeg)
+  private alunosPadrao: AlunoSessao[] = [
+    { id: 1, nome: 'Ana Clara', idade: 6, nivelAtual: 2, cargoNivel: 'Explorador', estrelasTotal: 5, pontos: 1250, fasesConcluidas: 8, progressoPct: 80, ativo: true, personagem: this.personagens[3] },
+    { id: 2, nome: 'Lucas Silva', idade: 7, nivelAtual: 2, cargoNivel: 'Programador', estrelasTotal: 4, pontos: 1120, fasesConcluidas: 8, progressoPct: 60, ativo: true, personagem: this.personagens[2] },
+    { id: 3, nome: 'Maria Eduarda', idade: 5, nivelAtual: 1, cargoNivel: 'Iniciante', estrelasTotal: 4, pontos: 980, fasesConcluidas: 5, progressoPct: 40, ativo: true, personagem: this.personagens[1] },
+    { id: 4, nome: 'Pedro Henrique', idade: 8, nivelAtual: 3, cargoNivel: 'Avançado', estrelasTotal: 4, pontos: 870, fasesConcluidas: 9, progressoPct: 90, ativo: true, personagem: this.personagens[2] },
+    { id: 5, nome: 'Juliana Souza', idade: 6, nivelAtual: 2, cargoNivel: 'Explorador', estrelasTotal: 4, pontos: 760, fasesConcluidas: 7, progressoPct: 70, ativo: true, personagem: this.personagens[1] }
   ];
+
+  public sessaoAbertaLocal = true;
 
   constructor(private http: HttpClient) {}
 
-  verificarSessaoAberta(): Observable<{ aberta: boolean; turma: string }> {
-    return this.http.get<any>(`${this.apiUrl}/sessoes/ativa`).pipe(
-      map(res => ({
-        aberta: res?.status === 'aberta' || res?.aberta === true,
-        turma: res?.turma?.nome || res?.nomeTurma || this.nomeTurmaAtual
-      })),
-      catchError(() => {
-        if (typeof window !== 'undefined') {
-          const statusSalvo = localStorage.getItem('sessao_aberta_codebuddies');
-          if (statusSalvo !== null) this.sessaoAbertaMock = JSON.parse(statusSalvo);
-          const turmaSalva = localStorage.getItem('nome_turma_codebuddies');
-          if (turmaSalva) this.nomeTurmaAtual = turmaSalva;
+  // 3.1 GET /api/sessoes/aberta
+  verificarSessaoAberta(): Observable<{ aberta: boolean; sessao?: any; turma: string }> {
+    return this.http.get<any>(`${this.apiUrl}/sessoes/aberta`).pipe(
+      map(res => {
+        const sessao = res?.sessao || res;
+        const aberta = Boolean(sessao && sessao.id && sessao.status !== 'ENCERRADA');
+        if (sessao?.id) {
+          sessionStorage.setItem('cb_sessao_id', String(sessao.id));
         }
-        return of({ aberta: this.sessaoAbertaMock, turma: this.nomeTurmaAtual });
-      })
-    );
-  }
-
-  abrirSessao(nomeTurma: string): void {
-    this.nomeTurmaAtual = nomeTurma || 'Turma AMPLA - Platina';
-    this.sessaoAbertaMock = true;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('sessao_aberta_codebuddies', 'true');
-      localStorage.setItem('nome_turma_codebuddies', this.nomeTurmaAtual);
-    }
-
-    this.http.post<any>(`${this.apiUrl}/sessoes`, { nomeTurma: this.nomeTurmaAtual }).pipe(
-      catchError(() => of(null))
-    ).subscribe(res => {
-      if (res?.id) this.sessaoIdAtual = res.id;
-    });
-  }
-
-  encerrarSessao(): void {
-    this.sessaoAbertaMock = false;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('sessao_aberta_codebuddies', 'false');
-    }
-
-    this.http.patch(`${this.apiUrl}/sessoes/${this.sessaoIdAtual}/encerrar`, {}).pipe(
-      catchError(() => of(null))
-    ).subscribe();
-  }
-
-  entrarNaSessao(nome: string, idade: number): Observable<any> {
-    const atual = this.obterAlunoLogado();
-    const alunoLocal = {
-      id: Date.now(),
-      nome,
-      idade,
-      personagem: atual?.personagem || this.personagens[0]
-    };
-
-    return this.http.post<any>(`${this.apiUrl}/alunos/entrar`, { nome, idade }).pipe(
-      tap(res => {
-        const dadosSalvar = { ...alunoLocal, ...(res || {}) };
-        this.salvarAlunoNoStorage(dadosSalvar);
+        return {
+          aberta,
+          sessao,
+          turma: sessao?.turma?.nome || 'Turma CodeBuddies'
+        };
       }),
-      catchError(() => {
-        this.salvarAlunoNoStorage(alunoLocal);
-        return of(alunoLocal);
+      catchError(() => of({
+        aberta: this.sessaoAbertaLocal,
+        turma: 'Turma CodeBuddies'
+      }))
+    );
+  }
+
+  // 3.2 POST /api/auth/aluno/entrar
+  entrarNaSessao(nome: string, idade: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/aluno/entrar`, { nome, idade }).pipe(
+      tap(res => {
+        if (res?.token) sessionStorage.setItem('cb_token_aluno', res.token);
+        if (res?.sessao?.id) sessionStorage.setItem('cb_sessao_id', String(res.sessao.id));
+        const perfil = {
+          id: res?.aluno?.id || 1,
+          nome: res?.aluno?.nome || nome,
+          idade: res?.aluno?.idade || idade,
+          novo: res?.novo ?? true,
+          personagem: this.personagens[0]
+        };
+        sessionStorage.setItem('cb_aluno_logado', JSON.stringify(perfil));
+      }),
+      catchError(err => {
+        // Se for erro real de validação/sessão da API, repassa para a tela mostrar
+        if (err?.error?.error?.code) {
+          throw err;
+        }
+        // Fallback offline para testes sem o servidor
+        const perfil = { id: 1, nome, idade, novo: true, personagem: this.personagens[0] };
+        sessionStorage.setItem('cb_aluno_logado', JSON.stringify(perfil));
+        return of({ token: 'mock-token', aluno: perfil, sessao: { id: 1 }, novo: true });
       })
     );
   }
 
-  private salvarAlunoNoStorage(aluno: any): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('aluno_codebuddies', JSON.stringify(aluno));
-    }
-    const existente = this.alunosSessaoMock.find(
-      a => a.nome.toLowerCase() === aluno.nome.toLowerCase() && a.idade === aluno.idade
-    );
-    if (!existente) {
-      this.alunosSessaoMock.push({
-        id: aluno.id || this.alunosSessaoMock.length + 1,
-        nome: aluno.nome,
-        idade: aluno.idade,
-        cargoNivel: 'Iniciante',
-        progressoPct: 20,
-        personagem: aluno.personagem || this.personagens[0],
+  // 3.3 GET /api/jogo/mapa
+  carregarMapaDoJogo(): Observable<{
+    fases: FaseMapa[];
+    nivelAtual: number;
+    estrelasTotais: number;
+    fasesConcluidas: number;
+    todasConcluidas: boolean;
+  }> {
+    const cores: ('verde' | 'azul' | 'roxo' | 'rosa' | 'laranja')[] = ['verde', 'azul', 'roxo', 'rosa', 'laranja'];
+    const sprites = [
+      { posX: '0%', posY: '0%' },
+      { posX: '50%', posY: '100%' },
+      { posX: '100%', posY: '0%' },
+      { posX: '100%', posY: '100%' },
+      { posX: '0%', posY: '100%' }
+    ];
+
+    return this.http.get<any>(`${this.apiUrl}/jogo/mapa`).pipe(
+      map(res => {
+        const fasesMapeadas: FaseMapa[] = (res.fases || []).map((f: any, idx: number) => ({
+          faseId: f.faseId,
+          id: f.faseId,
+          subtitulo: `FASE 0${idx + 1}`,
+          titulo: f.titulo,
+          etapaNome: f.nivelTitulo || f.titulo,
+          tipo: f.tipo,
+          nivelId: f.nivelId,
+          nivelOrdem: f.nivelOrdem,
+          nivelTitulo: f.nivelTitulo,
+          ordem: f.ordem,
+          status: f.status,
+          melhorEstrelas: f.melhorEstrelas || 0,
+          corCard: cores[idx % cores.length],
+          posX: sprites[idx % sprites.length].posX,
+          posY: sprites[idx % sprites.length].posY
+        }));
+        this.fasesPadrao = fasesMapeadas.length ? fasesMapeadas : this.fasesPadrao;
+        return {
+          fases: this.fasesPadrao,
+          nivelAtual: res.nivelAtual ?? 1,
+          estrelasTotais: res.estrelasTotais ?? 245,
+          fasesConcluidas: res.fasesConcluidas ?? 8,
+          todasConcluidas: Boolean(res.todasConcluidas)
+        };
+      }),
+      catchError(() => of({
+        fases: this.fasesPadrao,
         nivelAtual: 1,
-        estrelasTotal: this.obterTotalEstrelas(),
-        pontos: this.obterTotalEstrelas() * 250,
-        fasesConcluidas: this.fasesMock.filter(f => f.status === 'concluida').length,
-        ativo: true
-      });
-    }
+        estrelasTotais: this.obterTotalEstrelas(),
+        fasesConcluidas: 8,
+        todasConcluidas: false
+      }))
+    );
   }
 
-  selecionarPersonagem(personagem: Personagem): void {
-    const aluno = this.obterAlunoLogado();
-    if (aluno && typeof window !== 'undefined') {
-      aluno.personagem = personagem;
-      localStorage.setItem('aluno_codebuddies', JSON.stringify(aluno));
-    }
+  // 3.4 Passo 1: GET /api/jogo/fases/:faseId
+  obterFaseComDesafios(faseId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/jogo/fases/${faseId}`).pipe(
+      catchError(err => {
+        if (err?.error?.error?.code) throw err;
+        return of({
+          fase: { id: faseId, titulo: `Fase 0${faseId}`, tipo: 'DIGITACAO', ordem: faseId },
+          desafios: [
+            { id: 1, faseId, ordem: 1, enunciado: 'Pressione a tecla com a primeira letra da palavra BOLA', pontos: 150, opcoes: ['B', 'G', 'M', 'P'], respostaMock: 'b' },
+            { id: 2, faseId, ordem: 2, enunciado: 'Pressione a tecla com a primeira letra da palavra GATO', pontos: 100, opcoes: ['C', 'G', 'T', 'L'], respostaMock: 'g' },
+            { id: 3, faseId, ordem: 3, enunciado: 'Pressione a tecla com a primeira letra da palavra SAPO', pontos: 100, opcoes: ['S', 'R', 'F', 'V'], respostaMock: 's' },
+            { id: 4, faseId, ordem: 4, enunciado: 'Pressione a tecla com a primeira letra da palavra DADO', pontos: 100, opcoes: ['B', 'D', 'T', 'Q'], respostaMock: 'd' }
+          ],
+          totalDesafios: 4,
+          pontosPossiveis: 450
+        });
+      })
+    );
   }
 
-  obterAlunoLogado() {
-    if (typeof window === 'undefined') return null;
-    const dados = localStorage.getItem('aluno_codebuddies');
-    return dados ? JSON.parse(dados) : null;
+  // 3.4 Passo 3: POST /api/jogo/fases/:faseId/respostas
+  enviarRespostasFase(faseId: number, tempoSegundos: number, respostas: { desafioId: number; resposta: string }[]): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/jogo/fases/${faseId}/respostas`, {
+      tempoSegundos,
+      respostas
+    }).pipe(
+      catchError(() => {
+        const acertos = respostas.filter(r => r.resposta && r.resposta.trim() !== '').length;
+        const estrelas = Math.max(1, Math.min(5, acertos + 1));
+        const aprovada = estrelas >= 3;
+        this.salvarResultadoFase(faseId, estrelas);
+        return of({
+          estrelas,
+          percentual: Math.round((estrelas / 5) * 100),
+          pontos: estrelas * 100,
+          pontosPossiveis: 500,
+          acertos,
+          erros: Math.max(0, 4 - acertos),
+          desafios: respostas.map((r, i) => ({ desafioId: r.desafioId, ordem: i + 1, acertou: true, pontos: 100 })),
+          aprovada,
+          melhorEstrelas: estrelas,
+          novoRecorde: true,
+          proximaFaseId: faseId < 5 ? faseId + 1 : null,
+          nivelAtual: 1,
+          estrelasTotais: this.obterTotalEstrelas(),
+          novasConquistas: estrelas >= 4 ? [
+            { codigo: 'PRIMEIRA_FASE', icone: '🌟', titulo: 'Primeira estrela', descricao: 'Concluiu a fase brilhando!', conquistada: true }
+          ] : []
+        });
+      })
+    );
   }
 
-  obterFases(): Fase[] {
-    return this.fasesMock;
+  // 3.5 GET /api/jogo/conquistas
+  carregarConquistas(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/jogo/conquistas`).pipe(
+      catchError(() => of({
+        estrelasTotais: 245,
+        pontosTotais: 1280,
+        fasesConcluidas: 8,
+        totalFases: 10,
+        totalConquistadas: 3,
+        conquistas: [
+          { codigo: 'PRIMEIRA_FASE', icone: '🌟', titulo: 'Primeira Estrela', descricao: 'Concluiu a primeira fase.', conquistada: true },
+          { codigo: 'CINCO_ESTRELAS', icone: '🏆', titulo: 'Perfeição', descricao: 'Ganhou 5 estrelas em uma fase.', conquistada: true },
+          { codigo: 'EXPLORADOR', icone: '🚀', titulo: 'Explorador', descricao: 'Avançou na trilha de comandos.', conquistada: true },
+          { codigo: 'MESTRE_LOOPS', icone: '🔁', titulo: 'Mestre dos Loops', descricao: 'Dominou repetições.', conquistada: false }
+        ]
+      }))
+    );
+  }
+
+  // 3.6 GET /api/sessoes/:sessaoId/ranking
+  carregarRankingDaSessao(sessaoId?: number): Observable<{ disponivel: boolean; mensagem?: string; itens: AlunoSessao[] }> {
+    const id = sessaoId || Number(sessionStorage.getItem('cb_sessao_id') || 1);
+    return this.http.get<any>(`${this.apiUrl}/sessoes/${id}/ranking`).pipe(
+      map(res => ({
+        disponivel: true,
+        itens: (res.itens || []).map((item: any, idx: number) => ({
+          id: item.alunoId || idx + 1,
+          nome: item.nome,
+          idade: 7,
+          nivelAtual: item.nivelAlcancado || 1,
+          cargoNivel: 'Explorador',
+          estrelasTotal: item.estrelasNaSessao || 4,
+          pontos: (item.estrelasNaSessao || 4) * 250,
+          fasesConcluidas: item.fasesConcluidasNaSessao || 3,
+          progressoPct: 80,
+          ativo: true,
+          personagem: this.personagens[idx % this.personagens.length]
+        }))
+      })),
+      catchError(err => {
+        if (err?.error?.error?.code === 'RANKING_INDISPONIVEL') {
+          return of({
+            disponivel: false,
+            mensagem: err.error.error.message || 'O ranking aparece quando o professor encerrar a aula',
+            itens: []
+          });
+        }
+        return of({
+          disponivel: true,
+          itens: this.obterRanking()
+        });
+      })
+    );
+  }
+
+  // 4. Login do Professor: POST /api/auth/professor/login
+  loginProfessor(email: string, senha: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/professor/login`, { email, senha }).pipe(
+      tap(res => {
+        if (res?.token) sessionStorage.setItem('cb_token_professor', res.token);
+      })
+    );
+  }
+
+  obterAlunoLogado(): any {
+    const salvo = sessionStorage.getItem('cb_aluno_logado');
+    return salvo ? JSON.parse(salvo) : null;
+  }
+
+  salvarPersonagemEscolhido(personagem: Personagem): void {
+    const aluno = this.obterAlunoLogado() || { id: 1, nome: 'Ana Clara', idade: 6 };
+    aluno.personagem = personagem;
+    sessionStorage.setItem('cb_aluno_logado', JSON.stringify(aluno));
+  }
+
+  obterFases(): FaseMapa[] {
+    return this.fasesPadrao;
   }
 
   obterTotalEstrelas(): number {
-    return this.fasesMock.reduce((soma, f) => soma + f.estrelas, 0);
+    const soma = this.fasesPadrao.reduce((acc, f) => acc + (f.melhorEstrelas || 0), 0);
+    return soma > 6 ? soma : 245;
   }
 
-  obterTotalPontos(): number {
-    return this.obterTotalEstrelas() * 210;
-  }
-
-  obterHistorico() {
-    return this.historicoMock;
-  }
-
-  salvarResultadoFase(idFase: number, estrelasObtidas: number) {
-    const index = this.fasesMock.findIndex(f => f.id === idFase);
-    if (index !== -1) {
-      const fase = this.fasesMock[index];
-
-      this.historicoMock.unshift({
-        faseTitulo: fase.titulo,
-        estrelas: estrelasObtidas,
-        data: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
-
-      if (estrelasObtidas > fase.estrelas) {
-        fase.estrelas = estrelasObtidas;
+  salvarResultadoFase(idFase: number, estrelasObtidas: number): void {
+    const idx = this.fasesPadrao.findIndex(f => f.faseId === idFase);
+    if (idx !== -1) {
+      if (estrelasObtidas > this.fasesPadrao[idx].melhorEstrelas) {
+        this.fasesPadrao[idx].melhorEstrelas = estrelasObtidas;
       }
-
-      if (fase.estrelas >= 3) {
-        fase.status = 'concluida';
-        if (this.fasesMock[index + 1] && this.fasesMock[index + 1].status === 'bloqueada') {
-          this.fasesMock[index + 1].status = 'liberada';
+      if (this.fasesPadrao[idx].melhorEstrelas >= 3) {
+        this.fasesPadrao[idx].status = 'CONCLUIDA';
+        if (this.fasesPadrao[idx + 1] && this.fasesPadrao[idx + 1].status === 'BLOQUEADA') {
+          this.fasesPadrao[idx + 1].status = 'LIBERADA';
         }
-      }
-
-      const logado = this.obterAlunoLogado();
-      if (logado) {
-        const registro = this.alunosSessaoMock.find(
-          a => a.nome.toLowerCase() === logado.nome.toLowerCase()
-        );
-        if (registro) {
-          registro.estrelasTotal = this.obterTotalEstrelas();
-          registro.pontos = this.obterTotalPontos();
-          registro.fasesConcluidas = this.fasesMock.filter(f => f.status === 'concluida').length;
-          registro.progressoPct = Math.min(100, registro.fasesConcluidas * 20);
-        }
-
-        this.http.post(`${this.apiUrl}/tentativas`, {
-          alunoId: logado.id,
-          faseId: idFase,
-          estrelas: estrelasObtidas
-        }).pipe(catchError(() => of(null))).subscribe();
       }
     }
   }
 
   obterAlunosDaSessao(): AlunoSessao[] {
-    return this.alunosSessaoMock;
-  }
-
-  alternarStatusAluno(id: number): void {
-    const aluno = this.alunosSessaoMock.find(a => a.id === id);
-    if (aluno) {
-      aluno.ativo = !aluno.ativo;
-      this.http.patch(`${this.apiUrl}/alunos/${id}/status`, { ativo: aluno.ativo })
-        .pipe(catchError(() => of(null)))
-        .subscribe();
-    }
+    return this.alunosPadrao;
   }
 
   obterRanking(): AlunoSessao[] {
-    return [...this.alunosSessaoMock]
-      .filter(a => a.ativo)
-      .sort((a, b) => b.pontos - a.pontos);
+    return [...this.alunosPadrao].sort((a, b) => b.pontos - a.pontos);
+  }
+
+  alternarStatusAluno(id: number): void {
+    const aluno = this.alunosPadrao.find(a => a.id === id);
+    if (aluno) {
+      aluno.ativo = !aluno.ativo;
+      const endpoint = aluno.ativo ? 'reativar' : 'desativar';
+      this.http.post(`${this.apiUrl}/alunos/${id}/${endpoint}`, {}).pipe(catchError(() => of(null))).subscribe();
+    }
+  }
+
+  abrirSessao(nomeTurma: string): void {
+    this.sessaoAbertaLocal = true;
+  }
+
+  encerrarSessao(): void {
+    this.sessaoAbertaLocal = false;
+    const sessaoId = Number(sessionStorage.getItem('cb_sessao_id') || 1);
+    this.http.post(`${this.apiUrl}/sessoes/${sessaoId}/encerrar`, {}).pipe(catchError(() => of(null))).subscribe();
   }
 }
-

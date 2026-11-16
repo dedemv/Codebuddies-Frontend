@@ -1,7 +1,8 @@
 .pagina-ranking {
   min-height: 100vh;
-  background-color: #f5f7fb;
-  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6fb;
+  font-family: 'Segoe UI', 'Poppins', sans-serif;
+  padding-bottom: 60px;
 }
 
 .navbar-codebuddies {
@@ -15,99 +16,207 @@
 
 .logo { font-size: 24px; font-weight: 900; }
 .logo .amarelo { color: #ffd600; }
-.nav-links { display: flex; gap: 25px; }
-.nav-links a { color: white; text-decoration: none; font-weight: 600; }
-.pilula-prof { background: white; color: #333; padding: 8px 18px; border-radius: 30px; text-decoration: none; font-weight: bold; }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { color: white; text-decoration: none; font-weight: 600; opacity: 0.85; padding-bottom: 6px; }
+.nav-links a.ativo { opacity: 1; border-bottom: 3px solid white; }
+
+.pilula-prof {
+  background: white;
+  color: #333;
+  text-decoration: none;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 14px;
+}
 
 .container-ranking {
-  max-width: 900px;
-  margin: 35px auto;
-  padding: 0 20px;
+  max-width: 960px;
+  margin: 30px auto;
+  background: white;
+  border-radius: 30px;
+  padding: 35px 45px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-.container-ranking h2 {
+.cabecalho-ranking h1 {
   color: #1a237e;
-  font-size: 26px;
-  margin-bottom: 20px;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 4px;
 }
 
-.podio-faixas {
+.cabecalho-ranking p {
+  color: #78909c;
+  margin: 0 0 35px;
+}
+
+/* Pódio em 3 Colunas */
+.podio-top3 {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 25px;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 35px;
 }
 
-.faixa-podio {
-  border-radius: 18px;
-  padding: 28px 20px;
+.coluna-podio {
+  flex: 1;
+  max-width: 240px;
+  border-radius: 26px;
+  padding: 25px 18px;
   text-align: center;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
-/* Cores exatas da imagem ranking.jpeg */
-.faixa-podio.ouro {
-  background-color: #fbbc04;
-  color: #212121;
+.podio-segundo {
+  background: linear-gradient(180deg, #bbdefb 0%, #64b5f6 100%);
+  color: #0d47a1;
+  min-height: 210px;
 }
 
-.faixa-podio.prata {
-  background-color: #b8c2cc;
-  color: #ffffff;
+.podio-primeiro {
+  background: linear-gradient(180deg, #ffe082 0%, #ffca28 100%);
+  color: #4e342e;
+  min-height: 255px;
+  transform: translateY(-10px);
 }
 
-.faixa-podio.bronze {
-  background-color: #ff7722;
-  color: #ffffff;
+.podio-terceiro {
+  background: linear-gradient(180deg, #f8bbd0 0%, #f48fb1 100%);
+  color: #880e4f;
+  min-height: 195px;
 }
 
-.medalha-num { font-size: 22px; margin-bottom: 6px; }
-.nome-podio { font-size: 20px; }
-.pontos-podio { font-size: 18px; opacity: 0.95; }
-.estrelas-podio { font-size: 14px; margin-top: 4px; letter-spacing: 2px; }
+.coroa {
+  font-size: 36px;
+  margin-bottom: -8px;
+}
 
+.avatar-podio {
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: white;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-ouro {
+  width: 96px;
+  height: 96px;
+  border-color: #ffd600;
+}
+
+.sprite-mascote {
+  width: 78px;
+  height: 78px;
+  background-image: url('/img/personagens.jpg');
+  background-size: 300% 200%;
+  mix-blend-mode: multiply;
+}
+
+.medalha-numero {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -22px auto 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.coluna-podio h3 {
+  margin: 6px 0 4px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.pontos-podio {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.estrelas-podio {
+  color: #ff8f00;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+/* Lista 4º e 5º */
 .lista-demais {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-.linha-colocado {
-  background: white;
-  border-radius: 16px;
-  padding: 16px 25px;
+.linha-ranking {
+  background: #f8f9fc;
+  border-radius: 18px;
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
 }
 
-.esquerda-colocado {
+.pos-esquerda {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
+}
+
+.num-pos {
   font-size: 18px;
+  font-weight: 800;
+  color: #607d8b;
+  width: 24px;
 }
 
-.pos-num { color: #7e57c2; font-weight: bold; }
-.inicial-avatar { font-size: 28px; background: #ede7f6; padding: 6px 10px; border-radius: 50%; }
-.direita-colocado { display: flex; align-items: center; gap: 15px; }
-.estrelas-pequenas { color: #ffd600; }
-.pts-roxo { color: #ad1457; font-size: 18px; }
+.avatar-mini {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 
-.aviso-sessao-aberta {
-  background: white;
-  border: 3px dashed #ec407a;
-  border-radius: 20px;
-  padding: 40px;
+.avatar-mini .sprite-mascote {
+  width: 44px;
+  height: 44px;
+}
+
+.estrelas-centro {
+  color: #ffc107;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.apagada { color: #cfd8dc; }
+
+.pontos-direita strong {
+  color: #1a237e;
+  font-size: 16px;
+}
+
+.aviso-indisponivel {
   text-align: center;
+  padding: 45px 20px;
+  background: #fff8e1;
+  border-radius: 24px;
+  border: 3px dashed #ffc107;
 }
 
-.rodape-codebuddies {
-  text-align: center;
-  color: #78909c;
-  font-weight: 600;
-  margin-top: 50px;
-  padding-bottom: 30px;
-}
+.icone-segredo { font-size: 56px; }

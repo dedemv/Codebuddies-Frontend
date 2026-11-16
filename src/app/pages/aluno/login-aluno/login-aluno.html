@@ -1,120 +1,93 @@
 <div class="pagina-home">
-  <!-- Navbar Superior Oficial do Protótipo -->
-  <header class="navbar-codebuddies">
-    <div class="logo">
-      <span class="logo-icone">🎮</span>
-      <span class="logo-texto">CODE<span class="amarelo">BUDDIES</span></span>
-    </div>
+  <!-- Bloco Hero Magenta idêntico à tela principal 2.jpeg -->
+  <div class="hero-wrapper">
+    <header class="navbar-codebuddies">
+      <a routerLink="/entrar" class="logo-box">
+        <img src="/img/logo-banner.jpg" alt="CodeBuddies" class="logo-img" />
+      </a>
+      <nav class="nav-links">
+        <a routerLink="/entrar" class="ativo">Início</a>
+        <a routerLink="/professor/painel">Alunos</a>
+        <a routerLink="/mapa">Fases</a>
+        <a routerLink="/perfil">Progressos</a>
+        <a routerLink="/ranking">Ranking</a>
+      </nav>
+      <a routerLink="/professor/login" class="pilula-professor">
+        <span class="avatar-prof">👨‍🏫</span>
+        <span>Professor</span>
+        <span class="seta">⌄</span>
+      </a>
+    </header>
 
-    <nav class="nav-links">
-      <a routerLink="/entrar" class="ativo">Início</a>
-      <a routerLink="/professor/painel">Alunos</a>
-      <a routerLink="/mapa">Fases</a>
-      <a routerLink="/perfil">Progressos</a>
-      <a routerLink="/ranking">Ranking</a>
-    </nav>
+    <section class="hero-content">
+      <div class="hero-texto">
+        <h1>
+          Aprender<br />
+          programação pode ser<br />
+          <span class="destaque-amarelo">uma aventura!</span>
+        </h1>
+        <p class="descricao">
+          No CodeBuddies, as crianças aprendem<br />
+          programação de forma divertida, através<br />
+          de desafios, fases e muita brincadeira!
+        </p>
 
-    <a routerLink="/professor/login" class="pilula-professor">
-      <span class="avatar-prof">👨‍🏫</span>
-      <span>Professor ⌄</span>
-    </a>
-  </header>
-
-  <!-- Hero Banner Magenta -->
-  <section class="hero-section">
-    <div class="hero-texto">
-      <h1>
-        Aprender<br />
-        programação pode ser<br />
-        <span class="destaque-amarelo">uma aventura!</span>
-      </h1>
-      <p class="descricao">
-        No CodeBuddies, as crianças aprendem programação de forma divertida,
-        através de desafios, fases e muita brincadeira!
-      </p>
-
-      <!-- CA01: Se não houver sessão aberta -->
-      @if (!sessaoAberta) {
-        <div class="alerta-aguardando">
-          ⏳ <strong>Aguardando professor iniciar a aula</strong>
-        </div>
-      }
-
-      <!-- Formulário Integrado ao Hero para Entrar na Aventura (RF-P01) -->
-      @if (sessaoAberta) {
-        <form (ngSubmit)="entrar()" class="form-aventura">
-          <div class="inputs-linha">
-            <input 
-              type="text" 
-              [(ngModel)]="nome" 
-              name="nome" 
-              placeholder="Digite seu nome..." 
-              autocomplete="off" />
-            <input 
-              type="number" 
-              [(ngModel)]="idade" 
-              name="idade" 
-              min="5" 
-              max="8" 
-              placeholder="Idade (5-8)" 
-              class="input-idade" />
+        <!-- Seção 3.1 do GUIA_FRONT: Aguardando professor iniciar a aula -->
+        @if (!sessaoAberta) {
+          <div class="alerta-sessao-fechada">
+            ⏳ <strong>Aguardando professor iniciar a aula.</strong>
+            <span>A tela atualizará sozinha assim que a aula começar!</span>
           </div>
-
-          @if (erroMensagem) {
-            <div class="msg-erro">⚠️ {{ erroMensagem }}</div>
-          }
-
+        } @else {
           <div class="botoes-hero">
-            <button type="submit" class="btn-amarelo">
-              Começar aventura ➔
+            <button type="button" class="btn-comecar" (click)="clicarComecarAventura()">
+              Começar aventura <span class="seta-dir">→</span>
             </button>
-            <a routerLink="/personagem" class="btn-contorno">
-              Escolher Mascote
-            </a>
+            <a routerLink="/mapa" class="btn-conhecer">Conhecer fases</a>
           </div>
-        </form>
-      }
-    </div>
+        }
+      </div>
 
-    <!-- Grupo de Mascotes à Direita -->
-    <div class="hero-ilustracao">
-      <div class="bolha-codigo">&lt;/&gt;</div>
-      <div class="grupo-mascotes">
-        <span class="mascote-principal">🤖</span>
-        <div class="mascotes-menores">
-          <span>🐷</span>
-          <span>🐸</span>
-          <span>🦊</span>
-          <span>🐻‍❄️</span>
+      <!-- Ilustração dos Mascotes 3D à direita -->
+      <div class="hero-arte">
+        <img src="/img/logo-banner.jpg" alt="Turma CodeBuddies" class="mascotes-hero-img" />
+      </div>
+    </section>
+  </div>
+
+  <!-- Seção Inferior "Minha aventura" idêntica ao quadro 1 de telas principais.jpeg -->
+  <section class="secao-minha-aventura">
+    <div class="cabecalho-aventura">
+      <h2>Minha aventura</h2>
+      <div class="mascote-vamos-codar">
+        <span class="balao-fala">Vamos<br />codar?</span>
+        <div class="circulo-duck">
+          <div class="sprite-mascote" style="background-position: 50% 100%;"></div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- Seção Inferior: Minha Aventura -->
-  <section class="secao-minha-aventura">
-    <h2>Minha aventura</h2>
-    <div class="cards-resumo">
-      <div class="card-metrica">
-        <div class="icone-metrica">⭐</div>
+    <div class="grid-metricas-home">
+      <div class="card-stat">
+        <div class="icone-stat">⭐</div>
         <strong>245</strong>
         <span>ESTRELAS</span>
       </div>
 
-      <div class="card-metrica">
-        <div class="icone-metrica">🏆</div>
+      <div class="card-stat">
+        <div class="icone-stat">🏆</div>
         <strong>1.280</strong>
         <span>PONTOS</span>
       </div>
 
-      <div class="card-metrica">
-        <div class="icone-metrica">🚀</div>
+      <div class="card-stat">
+        <div class="icone-stat">🚀</div>
         <strong>8/12</strong>
         <span>FASES</span>
       </div>
 
-      <div class="card-metrica card-proximo">
-        <div class="icone-metrica">🎯</div>
+      <div class="card-stat card-proximo-desafio" routerLink="/mapa">
+        <div class="icone-alvo">🎯</div>
         <div>
           <strong>Próximo desafio</strong>
           <p>Loops e Repetições</p>
@@ -122,4 +95,39 @@
       </div>
     </div>
   </section>
+
+  <!-- Modal Infantil para Nome + Idade (Seção 3.2 do GUIA_FRONT.md) -->
+  @if (mostrarModalEntrada) {
+    <div class="modal-backdrop" (click)="mostrarModalEntrada = false">
+      <div class="modal-entrada" (click)="$event.stopPropagation()">
+        <button class="fechar-modal" (click)="mostrarModalEntrada = false">✕</button>
+        <h2>Qual é o seu nome? 🚀</h2>
+        <p>Digite seu nome e idade para entrar na aventura!</p>
+
+        <form (ngSubmit)="entrar()">
+          <div class="campo-form">
+            <label>Seu nome</label>
+            <input type="text" [(ngModel)]="nome" name="nome" placeholder="Ex: Ana" autocomplete="off" />
+            @if (erroNome) {
+              <small class="erro-campo">{{ erroNome }}</small>
+            }
+          </div>
+
+          <div class="campo-form">
+            <label>Sua idade (5 a 8 anos)</label>
+            <input type="number" [(ngModel)]="idade" name="idade" min="5" max="12" placeholder="Ex: 6" />
+            @if (erroIdade) {
+              <small class="erro-campo">{{ erroIdade }}</small>
+            }
+          </div>
+
+          @if (erroMensagem) {
+            <div class="erro-geral">{{ erroMensagem }}</div>
+          }
+
+          <button type="submit" class="btn-comecar btn-full">Entrar no Jogo →</button>
+        </form>
+      </div>
+    </div>
+  }
 </div>
