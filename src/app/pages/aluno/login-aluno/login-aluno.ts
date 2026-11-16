@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Sessao } from '../../../core/services/sessao';
@@ -21,21 +21,27 @@ export class LoginAluno implements OnInit, OnDestroy {
   erroIdade = '';
   mensagemBoasVindas = '';
   private timerPolling: any;
+  private isBrowser: boolean;
 
   constructor(
     private sessaoService: Sessao,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
-    this.checarSessao();
-    // Seção 3.1 do GUIA_FRONT.md: Consultar a cada ~5 segundos enquanto não houver aula aberta
-    this.timerPolling = setInterval(() => {
-      if (!this.sessaoAberta) {
-        this.checarSessao();
-      }
-    }, 5000);
+    // Só executa chamadas HTTP e setInterval se estiver no navegador (evita AbortError no SSR)
+    if (this.isBrowser) {
+      this.checarSessao();
+      this.timerPolling = setInterval(() => {
+        if (!this.sessaoAberta) {
+          this.checarSessao();
+        }
+      }, 5000);
+    }
   }
 
   ngOnDestroy(): void {
@@ -43,6 +49,7 @@ export class LoginAluno implements OnInit, OnDestroy {
   }
 
   checarSessao(): void {
+    if (!this.isBrowser) return;
     this.sessaoService.verificarSessaoAberta().subscribe(res => {
       this.sessaoAberta = res.aberta;
       this.cdr.detectChanges();
@@ -50,6 +57,7 @@ export class LoginAluno implements OnInit, OnDestroy {
   }
 
   clicarComecarAventura(): void {
+    if (!this.isBrowser) return;
     const jaLogado = this.sessaoService.obterAlunoLogado();
     if (jaLogado && sessionStorage.getItem('cb_token_aluno')) {
       this.router.navigate(['/mapa']);

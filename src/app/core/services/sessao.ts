@@ -17,20 +17,27 @@ export interface Personagem {
 export interface FaseMapa {
   faseId: number;
   id: number;
+  nivel: number;
   subtitulo: string;
   titulo: string;
   etapaNome: string;
-  tipo: 'DIGITACAO' | 'LOGICA' | 'MOUSE';
+  tipo: 'DIGITACAO' | 'LOGICA' | 'MOUSE' | 'digitacao' | 'logica' | 'mouse';
   nivelId: number;
   nivelOrdem: number;
   nivelTitulo: string;
   ordem: number;
-  status: 'LIBERADA' | 'BLOQUEADA' | 'CONCLUIDA';
+  status: 'LIBERADA' | 'BLOQUEADA' | 'CONCLUIDA' | 'liberada' | 'bloqueada' | 'concluida';
   melhorEstrelas: number;
-  corCard: 'verde' | 'azul' | 'roxo' | 'rosa' | 'laranja';
+  estrelas: number;
+  corCard: 'verde' | 'azul' | 'roxo' | 'rosa' | 'laranja' | string;
+  mascoteIcone?: string;
+  videoClasse?: string;
   posX: string;
   posY: string;
 }
+
+// Exporta "Fase" também para que perfil-aluno.ts e mapa-fases.ts funcionem sem erro!
+export type Fase = FaseMapa;
 
 export interface AlunoSessao {
   id: number;
@@ -64,11 +71,11 @@ export class Sessao {
 
   // Fases exatamente como na tela "Fases do Jogo" (telas principais.jpeg)
   private fasesPadrao: FaseMapa[] = [
-    { faseId: 1, id: 1, subtitulo: 'FASE 01', titulo: 'Primeiros passos', etapaNome: 'Iniciante', tipo: 'DIGITACAO', nivelId: 1, nivelOrdem: 1, nivelTitulo: 'Iniciante', ordem: 1, status: 'CONCLUIDA', melhorEstrelas: 4, corCard: 'verde', posX: '0%', posY: '0%' },
-    { faseId: 2, id: 2, subtitulo: 'FASE 02', titulo: 'Comandos', etapaNome: 'Comandos', tipo: 'MOUSE', nivelId: 1, nivelOrdem: 2, nivelTitulo: 'Comandos', ordem: 2, status: 'LIBERADA', melhorEstrelas: 2, corCard: 'azul', posX: '50%', posY: '100%' },
-    { faseId: 3, id: 3, subtitulo: 'FASE 03', titulo: 'Loops', etapaNome: 'Loops', tipo: 'LOGICA', nivelId: 1, nivelOrdem: 3, nivelTitulo: 'Loops', ordem: 3, status: 'BLOQUEADA', melhorEstrelas: 0, corCard: 'roxo', posX: '100%', posY: '0%' },
-    { faseId: 4, id: 4, subtitulo: 'FASE 04', titulo: 'Funções', etapaNome: 'Funções', tipo: 'LOGICA', nivelId: 2, nivelOrdem: 4, nivelTitulo: 'Funções', ordem: 4, status: 'BLOQUEADA', melhorEstrelas: 0, corCard: 'rosa', posX: '100%', posY: '100%' },
-    { faseId: 5, id: 5, subtitulo: 'FASE 05', titulo: 'Projetos Finais', etapaNome: 'Projetos', tipo: 'DIGITACAO', nivelId: 2, nivelOrdem: 5, nivelTitulo: 'Projetos', ordem: 5, status: 'BLOQUEADA', melhorEstrelas: 0, corCard: 'laranja', posX: '0%', posY: '100%' }
+    { faseId: 1, id: 1, nivel: 1, subtitulo: 'FASE 01', titulo: 'Primeiros passos', etapaNome: 'Iniciante', tipo: 'digitacao', nivelId: 1, nivelOrdem: 1, nivelTitulo: 'Iniciante', ordem: 1, status: 'liberada', melhorEstrelas: 4, estrelas: 4, corCard: 'verde', mascoteIcone: '🐻‍❄️', videoClasse: 'vid-pos-1', posX: '0%', posY: '0%' },
+    { faseId: 2, id: 2, nivel: 1, subtitulo: 'FASE 02', titulo: 'Comandos', etapaNome: 'Comandos', tipo: 'mouse', nivelId: 1, nivelOrdem: 2, nivelTitulo: 'Comandos', ordem: 2, status: 'liberada', melhorEstrelas: 2, estrelas: 2, corCard: 'azul', mascoteIcone: '🐦', videoClasse: 'vid-pos-2', posX: '50%', posY: '100%' },
+    { faseId: 3, id: 3, nivel: 1, subtitulo: 'FASE 03', titulo: 'Loops', etapaNome: 'Loops', tipo: 'logica', nivelId: 1, nivelOrdem: 3, nivelTitulo: 'Loops', ordem: 3, status: 'bloqueada', melhorEstrelas: 0, estrelas: 0, corCard: 'roxo', mascoteIcone: '🐸', videoClasse: 'vid-pos-3', posX: '100%', posY: '0%' },
+    { faseId: 4, id: 4, nivel: 2, subtitulo: 'FASE 04', titulo: 'Funções', etapaNome: 'Funções', tipo: 'logica', nivelId: 2, nivelOrdem: 4, nivelTitulo: 'Funções', ordem: 4, status: 'bloqueada', melhorEstrelas: 0, estrelas: 0, corCard: 'rosa', mascoteIcone: '🦊', videoClasse: 'vid-pos-4', posX: '100%', posY: '100%' },
+    { faseId: 5, id: 5, nivel: 2, subtitulo: 'FASE 05', titulo: 'Projetos Finais', etapaNome: 'Projetos', tipo: 'digitacao', nivelId: 2, nivelOrdem: 5, nivelTitulo: 'Projetos', ordem: 5, status: 'bloqueada', melhorEstrelas: 0, estrelas: 0, corCard: 'laranja', mascoteIcone: '🐶', videoClasse: 'vid-pos-5', posX: '0%', posY: '100%' }
   ];
 
   // Alunos exatamente como nas telas "Alunos", "Progressos" e "Ranking" (telas principais.jpeg)
@@ -80,7 +87,7 @@ export class Sessao {
     { id: 5, nome: 'Juliana Souza', idade: 6, nivelAtual: 2, cargoNivel: 'Explorador', estrelasTotal: 4, pontos: 760, fasesConcluidas: 7, progressoPct: 70, ativo: true, personagem: this.personagens[1] }
   ];
 
-  public sessaoAbertaLocal = true;
+  public sessaoAbertaLocal = false;
 
   constructor(private http: HttpClient) {}
 
@@ -89,20 +96,32 @@ export class Sessao {
     return this.http.get<any>(`${this.apiUrl}/sessoes/aberta`).pipe(
       map(res => {
         const sessao = res?.sessao || res;
-        const aberta = Boolean(sessao && sessao.id && sessao.status !== 'ENCERRADA');
-        if (sessao?.id) {
-          sessionStorage.setItem('cb_sessao_id', String(sessao.id));
+        const aberta = Boolean(sessao && sessao.id && sessao.status === 'ABERTA');
+        if (this.isBrowser) {
+          sessionStorage.setItem('cb_sessao_aberta', String(aberta));
+          if (sessao?.id) {
+            sessionStorage.setItem('cb_sessao_id', String(sessao.id));
+          }
         }
+        this.sessaoAbertaLocal = aberta;
         return {
           aberta,
           sessao,
           turma: sessao?.turma?.nome || 'Turma CodeBuddies'
         };
       }),
-      catchError(() => of({
-        aberta: this.sessaoAbertaLocal,
-        turma: 'Turma CodeBuddies'
-      }))
+      catchError(() => {
+        if (this.isBrowser) {
+          const salvo = sessionStorage.getItem('cb_sessao_aberta');
+          if (salvo !== null) {
+            this.sessaoAbertaLocal = salvo === 'true';
+          }
+        }
+        return of({
+          aberta: this.sessaoAbertaLocal,
+          turma: 'Turma CodeBuddies'
+        });
+      })
     );
   }
 
@@ -317,6 +336,20 @@ export class Sessao {
     sessionStorage.setItem('cb_aluno_logado', JSON.stringify(aluno));
   }
 
+  // Mantém compatibilidade com selecao-personagem.ts
+  selecionarPersonagem(personagem: Personagem): void {
+    this.salvarPersonagemEscolhido(personagem);
+  }
+
+  // Mantém compatibilidade caso alguma tela consulte histórico ou pontos
+  obterHistorico(): { faseTitulo: string; estrelas: number; data: string }[] {
+    return [];
+  }
+
+  obterTotalPontos(): number {
+    return this.obterTotalEstrelas() * 210;
+  }
+
   obterFases(): FaseMapa[] {
     return this.fasesPadrao;
   }
@@ -358,13 +391,40 @@ export class Sessao {
     }
   }
 
-  abrirSessao(nomeTurma: string): void {
+  abrirSessao(nomeTurma: string = 'Turma CodeBuddies'): Observable<any> {
     this.sessaoAbertaLocal = true;
+    if (this.isBrowser) {
+      sessionStorage.setItem('cb_sessao_aberta', 'true');
+    }
+
+    // Tenta criar e abrir no back-end (e se o professor não tiver token ou der erro, mantém aberto localmente)
+    return this.http.get<any>(`${this.apiUrl}/turmas`).pipe(
+      map(res => {
+        const lista = Array.isArray(res) ? res : (res?.turmas || res?.itens || []);
+        return lista[0]?.id || 1;
+      }),
+      catchError(() => of(1)),
+      tap((turmaId: number) => {
+        this.http.post<any>(`${this.apiUrl}/sessoes`, { turmaId }).pipe(
+          tap(sessaoCriada => {
+            const id = sessaoCriada?.id || sessaoCriada?.sessao?.id || 1;
+            if (this.isBrowser) sessionStorage.setItem('cb_sessao_id', String(id));
+            this.http.post(`${this.apiUrl}/sessoes/${id}/abrir`, {}).pipe(catchError(() => of(null))).subscribe();
+          }),
+          catchError(() => of(null))
+        ).subscribe();
+      })
+    );
   }
 
-  encerrarSessao(): void {
+  encerrarSessao(): Observable<any> {
     this.sessaoAbertaLocal = false;
-    const sessaoId = Number(sessionStorage.getItem('cb_sessao_id') || 1);
-    this.http.post(`${this.apiUrl}/sessoes/${sessaoId}/encerrar`, {}).pipe(catchError(() => of(null))).subscribe();
+    if (this.isBrowser) {
+      sessionStorage.setItem('cb_sessao_aberta', 'false');
+    }
+    const sessaoId = this.isBrowser ? Number(sessionStorage.getItem('cb_sessao_id') || 1) : 1;
+    return this.http.post(`${this.apiUrl}/sessoes/${sessaoId}/encerrar`, {}).pipe(
+      catchError(() => of({ encerrada: true }))
+    );
   }
 }

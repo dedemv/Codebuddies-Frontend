@@ -1,36 +1,49 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Sessao, AlunoSessao } from '../../../core/services/sessao';
 
 @Component({
   selector: 'app-painel-sessao',
   standalone: true,
-  imports: [FormsModule, RouterLink, CommonModule],
+  imports: [FormsModule, RouterModule, CommonModule],
   templateUrl: './painel-sessao.html',
   styleUrl: './painel-sessao.css'
 })
 export class PainelSessao implements OnInit {
-  sessaoAberta = true;
-  nomeTurma = '';
+  // Começa como false até verificar se realmente existe sessão aberta
+  sessaoAberta = false;
+  nomeTurma = 'Turma CodeBuddies';
   alunos: AlunoSessao[] = [];
   termoBusca = '';
   filtroStatus = 'todos';
   confirmandoEncerramento = false;
+  private isBrowser: boolean;
 
-  constructor(private sessaoService: Sessao, private router: Router) {}
+  constructor(
+    private sessaoService: Sessao,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
-    this.atualizarDados();
+    this.alunos = this.sessaoService.obterAlunosDaSessao();
+    if (this.isBrowser) {
+      this.atualizarDados();
+    }
   }
 
   atualizarDados(): void {
     this.sessaoService.verificarSessaoAberta().subscribe(res => {
       this.sessaoAberta = res.aberta;
-      this.nomeTurma = res.turma;
+      this.nomeTurma = res.turma || 'Turma CodeBuddies';
+      this.alunos = this.sessaoService.obterAlunosDaSessao();
+      this.cdr.detectChanges();
     });
-    this.alunos = this.sessaoService.obterAlunosDaSessao();
   }
 
   get alunosFiltrados(): AlunoSessao[] {
@@ -45,19 +58,25 @@ export class PainelSessao implements OnInit {
   }
 
   criarEAbrirSessao(): void {
-    this.sessaoService.abrirSessao(this.nomeTurma);
-    this.atualizarDados();
+    this.sessaoService.abrirSessao(this.nomeTurma).subscribe(() => {
+      this.sessaoAberta = true;
+      this.confirmandoEncerramento = false;
+      this.cdr.detectChanges();
+    });
   }
 
   confirmarEncerramento(): void {
-    this.sessaoService.encerrarSessao();
-    this.confirmandoEncerramento = false;
-    this.atualizarDados();
-    this.router.navigate(['/ranking']);
+    this.sessaoService.encerrarSessao().subscribe(() => {
+      this.sessaoAberta = false;
+      this.confirmandoEncerramento = false;
+      this.cdr.detectChanges();
+      this.router.navigate(['/ranking']);
+    });
   }
 
   alternarStatus(id: number): void {
     this.sessaoService.alternarStatusAluno(id);
-    this.atualizarDados();
+    this.alunos = this.sessaoService.obterAlunosDaSessao();
+    this.cdr.detectChanges();
   }
 }
