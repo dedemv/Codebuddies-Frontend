@@ -1,22 +1,35 @@
 <div class="tela-prof-login">
   <div class="card-prof">
     <h2>👨‍🏫 Área do Professor</h2>
-    <p>Digite sua senha ou PIN de acesso para gerenciar a aula</p>
+    <p>Digite seu e-mail e senha para gerenciar a aula</p>
 
     <form (ngSubmit)="entrar()">
-      <input 
-        type="password" 
-        [(ngModel)]="pin" 
-        name="pin" 
-        placeholder="Digite o PIN (ex: 1234)" />
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        placeholder="E-mail (ex: professor@escola.com)"
+        autocomplete="email"
+        required
+        style="margin-bottom: 10px;" />
+
+      <input
+        type="password"
+        [(ngModel)]="senha"
+        name="senha"
+        placeholder="Sua senha"
+        autocomplete="current-password"
+        required />
 
       @if (erro) {
         <p class="msg-erro">{{ erro }}</p>
       }
 
-      <button type="submit" class="btn-acessar">Acessar Painel</button>
+      <button type="submit" class="btn-acessar" [disabled]="carregando">
+        {{ carregando ? 'Entrando...' : 'Acessar Painel' }}
+      </button>
     </form>
 
-    <a routerLink="/entrar" class="link-voltar">⬅️ Voltar para a tela das crianças</a>
+    <a routerLink="/" class="link-voltar">⬅️ Voltar para a entrada dos alunos</a>
   </div>
 </div>

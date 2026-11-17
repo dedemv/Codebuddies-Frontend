@@ -1,94 +1,157 @@
 <div class="tela-jogo">
   <header class="topo-jogo">
-    <button type="button" class="btn-voltar" (click)="voltarAoMapa()">⬅️ Mapa de Fases</button>
+    <button type="button" class="btn-voltar" (click)="voltarAoMapa()">⬅️ Sair da fase</button>
     <h2>{{ tituloFase }}</h2>
-    <div class="placar-tempo-real">
-      <span class="badge-acerto">✅ Acertos: {{ acertosParciais }}</span>
-      <span class="badge-erro">❌ Erros: {{ errosParciais }}</span>
-      <span class="progresso-info">Desafio {{ indiceAtual + 1 }} / {{ desafios.length }}</span>
-    </div>
+    @if (!resultadoFinal && desafios.length > 0) {
+      <div class="placar-tempo-real">
+        <span class="progresso-info">Desafio {{ indiceAtual + 1 }} de {{ desafios.length }}</span>
+      </div>
+    }
   </header>
 
-  <div class="barra-progresso-container">
-    <div class="barra-progresso-preenchimento" [style.width.%]="progressoPct"></div>
-  </div>
+  @if (!resultadoFinal && desafios.length > 0) {
+    <div class="barra-progresso-container">
+      <div class="barra-progresso-preenchimento" [style.width.%]="progressoPct"></div>
+    </div>
+  }
 
-  @if (!resultadoFinal && desafioAtual) {
-    <main
-      class="card-desafio"
-      [class.borda-acerto]="feedback === 'acerto'"
-      [class.borda-erro]="feedback === 'erro'">
-
-      <span class="etiqueta-etapa">{{ faseAtual?.etapaNome }}</span>
-      <p class="pergunta">{{ desafioAtual.enunciado }}</p>
-      <p class="dica">💡 Dica: {{ desafioAtual.dica }}</p>
-
-      @if (faseId === 1) {
-        <div class="tecla-gigante">{{ desafioAtual.alvo }}</div>
-        <p class="instrucao-teclado">⌨️ Pressione a tecla no seu teclado ou clique na letra correta:</p>
-      }
-
-      <div class="opcoes-container">
-        @for (opcao of desafioAtual.opcoes; track opcao) {
-          <button
-            type="button"
-            class="btn-opcao"
-            [class.opcao-correta]="feedback && opcao === desafioAtual.alvo"
-            [class.opcao-errada]="feedback === 'erro' && opcao === respostaSelecionada"
-            (click)="responder(opcao)">
-            {{ opcao }}
-          </button>
-        }
-      </div>
-
-      @if (feedback) {
-        <div
-          class="banner-feedback"
-          [class.fundo-acerto]="feedback === 'acerto'"
-          [class.fundo-erro]="feedback === 'erro'">
-          {{ mensagemFeedback }}
-        </div>
-      }
+  @if (erroFase) {
+    <main class="card-desafio" style="text-align: center;">
+      <h2>😕 {{ erroFase }}</h2>
+      <button type="button" class="btn-acao btn-menu" (click)="voltarAoMapa()" style="margin-top: 16px;">
+        Voltar ao Mapa 🗺️
+      </button>
     </main>
   }
 
+  <!-- A4 — Jogar Fase (1 desafio por vez, sem cronômetro visível e sem respostaCorreta) -->
+  @if (!resultadoFinal && !erroFase && desafioAtual) {
+    <main class="card-desafio">
+      <span class="etiqueta-etapa">{{ faseAtual?.nivel?.titulo || 'Desafio ' + (indiceAtual + 1) }}</span>
+      <p class="pergunta">{{ desafioAtual.enunciado }}</p>
+
+      @if (desafioAtual.opcoes && desafioAtual.opcoes.length > 0) {
+        <div class="opcoes-container" style="margin-bottom: 16px;">
+          @for (opcao of desafioAtual.opcoes; track opcao) {
+            <button
+              type="button"
+              class="btn-opcao"
+              [disabled]="enviando"
+              (click)="selecionarOpcao(opcao)">
+              {{ opcao }}
+            </button>
+          }
+        </div>
+      }
+
+      <div style="margin: 16px 0; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <input
+          type="text"
+          [(ngModel)]="respostaDigitada"
+          placeholder="Digite sua resposta aqui..."
+          style="font-size: 1.4rem; padding: 12px 18px; border-radius: 12px; border: 2px solid #ccc; text-align: center; width: 100%; max-width: 400px;"
+          autofocus />
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button
+            type="button"
+            class="btn-acao btn-avancar"
+            [disabled]="!respostaDigitada.trim() || enviando"
+            (click)="confirmarProximo()">
+            {{ indiceAtual + 1 === desafios.length ? 'Finalizar ✅' : 'Próximo ➡️' }}
+          </button>
+
+          <button
+            type="button"
+            class="btn-acao btn-refazer"
+            [disabled]="enviando"
+            (click)="pularDesafio()">
+            Pular ⏭️
+          </button>
+        </div>
+      </div>
+    </main>
+  }
+
+  <!-- A5 — Resultado da Fase (Seção 5 - A5 da Spec) -->
   @if (resultadoFinal) {
     <div class="card-resultado" [class.sucesso]="resultadoFinal.aprovada" [class.derrota]="!resultadoFinal.aprovada">
       @if (resultadoFinal.aprovada) {
-        <div class="icone-resultado">🏆</div>
-        <h1>Parabéns! Fase Concluída!</h1>
-        <p>Você mandou muito bem e liberou o próximo desafio!</p>
+        <div class="icone-resultado">🎉</div>
+        <h1>Parabéns! 🎉</h1>
       } @else {
         <div class="icone-resultado">💪</div>
-        <h1>Quase lá! Vamos tentar de novo?</h1>
-        <p>Você precisa de pelo menos 3 estrelas para desbloquear a próxima fase.</p>
+        <h1>Quase lá! Tente de novo 💪</h1>
       }
 
+      @if (resultadoFinal.novoRecorde) {
+        <div style="background: #ffca28; color: #333; display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: bold; margin: 8px 0;">
+          🏅 Novo recorde!
+        </div>
+      }
+
+      @if (resultadoFinal.aprovada && resultadoFinal.proximaFaseId === null) {
+        <div style="background: #fff8e1; border: 2px solid #ffca28; padding: 12px; border-radius: 14px; margin: 10px 0;">
+          <h2>👑 Você é um Mestre CodeBuddies! 👑</h2>
+        </div>
+      }
+
+      <!-- Estrelas (0 a 5) -->
       <div class="estrelas-resultado">
         @for (estrela of [1, 2, 3, 4, 5]; track estrela) {
           <span class="estrela-item" [class.estrela-ganha]="estrela <= resultadoFinal.estrelas">⭐</span>
         }
       </div>
 
+      <p style="font-size: 1.2rem; font-weight: bold;">
+        Você acertou {{ resultadoFinal.acertos }} de {{ resultadoFinal.acertos + resultadoFinal.erros }}
+      </p>
+
       <div class="resumo-numeros">
-        <span class="resumo-ok">✅ {{ resultadoFinal.acertos }} Acertos</span>
-        <span class="resumo-err">❌ {{ resultadoFinal.erros }} Erros</span>
-        <span class="resumo-pts">🏅 {{ resultadoFinal.pontos }} Pontos</span>
+        <span class="resumo-pts">🏅 {{ resultadoFinal.pontos }} de {{ resultadoFinal.pontosPossiveis }} pontos</span>
       </div>
 
-      <div class="botoes-resultado">
-        <button type="button" class="btn-acao btn-refazer" (click)="refazerFase()">
-          Jogar Novamente 🔄
-        </button>
+      <!-- ✓ / ✗ de cada desafio (Sem mostrar a respostaCorreta!) -->
+      @if (resultadoFinal.desafios?.length) {
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 16px 0;">
+          @for (d of resultadoFinal.desafios; track d.desafioId) {
+            <span
+              [style.background]="d.acertou ? '#e8f5e9' : '#ffebee'"
+              [style.color]="d.acertou ? '#2e7d32' : '#c62828'"
+              style="padding: 8px 14px; border-radius: 10px; font-weight: bold;">
+              Desafio {{ d.ordem }}: {{ d.acertou ? '✓' : '✗' }}
+            </span>
+          }
+        </div>
+      }
 
-        @if (resultadoFinal.aprovada && faseId < 5) {
+      <!-- Animação de Medalhas Novas (novasConquistas) -->
+      @if (resultadoFinal.novasConquistas?.length) {
+        <div style="margin: 16px 0; padding: 14px; background: #f3e5f5; border-radius: 14px;">
+          <h3>🎖️ Novas Conquistas Desbloqueadas!</h3>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px;">
+            @for (med of resultadoFinal.novasConquistas; track med.codigo) {
+              <div style="background: #fff; padding: 10px 16px; border-radius: 12px; font-weight: bold;">
+                {{ med.icone }} {{ med.titulo }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="botoes-resultado">
+        @if (resultadoFinal.aprovada && resultadoFinal.proximaFaseId !== null) {
           <button type="button" class="btn-acao btn-avancar" (click)="irProximaFase()">
-            Avançar para Fase 0{{ faseId + 1 }} 🚀
+            Avançar 🚀
           </button>
         }
 
+        <button type="button" class="btn-acao btn-refazer" (click)="refazerFase()">
+          Jogar de novo 🔄
+        </button>
+
         <button type="button" class="btn-acao btn-menu" (click)="voltarAoMapa()">
-          Voltar ao Mapa 🗺️
+          Voltar ao mapa 🗺️
         </button>
       </div>
     </div>

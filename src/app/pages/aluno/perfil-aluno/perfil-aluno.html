@@ -1,57 +1,80 @@
 <div class="pagina-progressos">
-  <!-- Cabeçalho Magenta Oficial -->
+  <!-- Cabeçalho Exclusivo do Aluno (Seção 4 e 8 da Spec) -->
   <header class="navbar-codebuddies">
     <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
     <nav class="nav-links">
-      <a routerLink="/entrar">Início</a>
-      <a routerLink="/professor/painel">Alunos</a>
-      <a routerLink="/mapa">Fases</a>
-      <a routerLink="/perfil" class="ativo">Progressos</a>
-      <a routerLink="/ranking">Ranking</a>
+      <a routerLink="/aluno/inicio" routerLinkActive="ativo">Início</a>
+      <a routerLink="/aluno/fases" routerLinkActive="ativo">Fases</a>
+      <a routerLink="/aluno/conquistas" routerLinkActive="ativo">Conquistas</a>
+      <a routerLink="/aluno/ranking" routerLinkActive="ativo">Ranking</a>
     </nav>
-    <a routerLink="/professor/painel" class="pilula-prof">👨‍🏫 Professor ⌄</a>
+    <button type="button" class="pilula-prof" (click)="sair()" style="border: none; cursor: pointer;">
+      {{ alunoLogado?.personagem?.icone || '🧒' }} {{ alunoLogado?.nome || 'Aluno' }} · Sair
+    </button>
   </header>
 
   <main class="container-progressos animar-entrada">
-    <!-- Topo com Título e Seletor de Alunos -->
     <div class="cabecalho-secao">
       <div>
-        <h1>Progressos 📊</h1>
-        <p>Acompanhe o desenvolvimento e as conquistas na programação.</p>
+        <h1>Minha Aventura & Conquistas 🚀</h1>
+        <p>Veja suas estrelas, pontos, medalhas e o próximo desafio!</p>
       </div>
-
-      <select class="select-alunos" (change)="aoTrocarFiltro($event)">
-        <option [value]="0">👤 Meu Perfil ({{ alunoLogado?.nome || 'Lucas Silva' }})</option>
-        @for (a of alunosTurma; track a.id) {
-          <option [value]="a.id">👦 {{ a.nome }} ({{ a.idade }} anos)</option>
-        }
-      </select>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn-3d-amarelo" (click)="comecarAventura()">
+          ▶ Começar aventura
+        </button>
+        <a routerLink="/aluno/fases" class="btn-3d-rosa">🗺️ Conhecer fases</a>
+      </div>
     </div>
 
-    <!-- Grid Principal -->
+    <!-- Resumo A2: Estrelas, Pontos, Fases e Próximo Desafio -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="card-fases-concluidas" style="text-align: center;">
+        <span>⭐ Estrelas</span>
+        <div class="numero-fases"><strong>{{ totalEstrelas }}</strong></div>
+      </div>
+      <div class="card-fases-concluidas" style="text-align: center;">
+        <span>🏆 Pontos</span>
+        <div class="numero-fases"><strong>{{ pontosTotais }}</strong></div>
+      </div>
+      <div class="card-fases-concluidas" style="text-align: center;">
+        <span>🚀 Fases</span>
+        <div class="numero-fases"><strong>{{ fasesConcluidasCount }} / {{ totalFasesCount }}</strong></div>
+      </div>
+      <div class="card-fases-concluidas" style="text-align: center; cursor: pointer;" (click)="comecarAventura()">
+        <span>🎯 Próximo desafio</span>
+        <div style="margin-top: 6px; font-weight: bold;">
+          @if (todasConcluidas) {
+            Você completou tudo! 👑
+          } @else if (proximaFase) {
+            {{ proximaFase.titulo }} ({{ proximaFase.nivelTitulo }})
+          } @else {
+            Abrir Mapa
+          }
+        </div>
+      </div>
+    </div>
+
     <div class="grid-progressos">
-      <!-- Coluna Esquerda -->
       <section class="coluna-principal">
-        <!-- Card de Identificação do Aluno com Sprite Real -->
+        <!-- Identificação do Aluno -->
         <div class="card-identificacao">
           <div class="avatar-circulo" [style.background]="alunoLogado?.personagem?.corFundo || '#e8f5e9'">
-            <div 
+            <div
               class="sprite-mascote sprite-perfil animar-flutuar"
               [style.background-position]="(alunoLogado?.personagem?.posX || '100%') + ' ' + (alunoLogado?.personagem?.posY || '0%')">
             </div>
           </div>
 
           <div class="dados-aluno">
-            <h2>{{ alunoLogado?.nome || 'Lucas Silva' }}</h2>
-            <p class="idade-texto">🎂 {{ alunoLogado?.idade || 7 }} anos</p>
-            <p class="nivel-texto">🏅 Nível: <strong>{{ alunoLogado?.cargoNivel || 'Programador' }}</strong></p>
-            <div class="estrelas-douradas">
-              ★★★★<span class="estrela-apagada">★</span>
-            </div>
+            <h2>{{ alunoLogado?.nome }}</h2>
+            <p class="idade-texto">🎂 {{ alunoLogado?.idade }} anos</p>
+            <p class="nivel-texto">🏅 Nível atual: <strong>{{ nivelTituloAtual }}</strong></p>
+            <p class="nivel-texto">⭐ Total de estrelas: <strong>{{ totalEstrelas }}</strong></p>
           </div>
         </div>
 
-        <!-- Card das 5 Barras de Progresso Animadas -->
+        <!-- Barras de Progresso por Nível (Dados Reais da API) -->
         <div class="card-barras">
           @for (item of metricasHabilidades; track item.nome) {
             <div class="linha-progresso">
@@ -60,8 +83,8 @@
                 <span class="valor-pct">{{ item.percentual }}%</span>
               </div>
               <div class="trilho-barra">
-                <div 
-                  class="preenchimento-barra" 
+                <div
+                  class="preenchimento-barra"
                   [ngClass]="item.cor"
                   [style.width.%]="item.percentual">
                 </div>
@@ -69,11 +92,28 @@
             </div>
           }
         </div>
+
+        <!-- A6 — Grade com as 6 Medalhas de Conquistas -->
+        <div class="card-barras" style="margin-top: 20px;">
+          <h3 style="margin-bottom: 12px;">🏅 Minhas Conquistas (Você tem {{ totalConquistadas }} de {{ conquistas.length || 6 }} medalhas)</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            @for (c of conquistas; track c.codigo) {
+              <div
+                [style.opacity]="c.conquistada ? '1' : '0.45'"
+                [style.filter]="c.conquistada ? 'none' : 'grayscale(100%)'"
+                style="padding: 14px; border-radius: 14px; border: 2px solid #eee; background: #fff; display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 2rem;">{{ c.conquistada ? c.icone : '🔒' }}</span>
+                <div>
+                  <strong style="display: block;">{{ c.titulo }}</strong>
+                  <small>{{ c.descricao }}</small>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
       </section>
 
-      <!-- Coluna Direita -->
       <aside class="coluna-lateral">
-        <!-- Card Fases Concluídas -->
         <div class="card-fases-concluidas">
           <span>Fases concluídas</span>
           <div class="numero-fases">
@@ -82,7 +122,6 @@
           </div>
         </div>
 
-        <!-- Card Motivacional "Continue assim!" com o Mascote Pig -->
         <div class="card-continue-assim">
           <div class="trofeu">🏆</div>
           <h3>Continue assim!</h3>
@@ -91,14 +130,13 @@
             Cada desafio te deixa mais forte!
           </p>
 
-          <!-- Mascote Pig recortado da imagem -->
           <div class="palco-pig animar-flutuar">
             <div class="sprite-mascote sprite-pig" style="background-position: 50% 0%;"></div>
           </div>
 
           <div class="botoes-perfil-lateral">
             <a routerLink="/personagem" class="btn-3d-rosa">🎭 Trocar Mascote</a>
-            <a routerLink="/mapa" class="btn-3d-amarelo">🗺️ Jogar Fases</a>
+            <a routerLink="/aluno/fases" class="btn-3d-amarelo">🗺️ Jogar Fases</a>
           </div>
         </div>
       </aside>

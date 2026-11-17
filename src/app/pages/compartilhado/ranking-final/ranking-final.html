@@ -1,79 +1,111 @@
 <div class="pagina-ranking">
-  <!-- Cabeçalho Magenta Oficial -->
   <header class="navbar-codebuddies">
     <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
-    <nav class="nav-links">
-      <a routerLink="/entrar">Início</a>
-      <a routerLink="/professor/painel">Alunos</a>
-      <a routerLink="/mapa">Fases</a>
-      <a routerLink="/perfil">Progressos</a>
-      <a routerLink="/ranking" class="ativo">Ranking</a>
-    </nav>
-    <a routerLink="/professor/painel" class="pilula-prof">👨‍🏫 Professor ⌄</a>
+
+    @if (ehProfessor) {
+      <nav class="nav-links">
+        <a routerLink="/professor">Início</a>
+        <a routerLink="/professor/alunos">Alunos</a>
+        <a routerLink="/professor/fases">Fases</a>
+        <a routerLink="/professor/relatorios">Relatórios</a>
+        <a routerLink="/professor/ranking" class="ativo">Ranking</a>
+      </nav>
+      <button type="button" class="pilula-prof" (click)="sair()" style="border: none; cursor: pointer;">
+        👨‍🏫 Professor · Sair
+      </button>
+    } @else {
+      <nav class="nav-links">
+        <a routerLink="/aluno/inicio">Início</a>
+        <a routerLink="/aluno/fases">Fases</a>
+        <a routerLink="/aluno/conquistas">Conquistas</a>
+        <a routerLink="/aluno/ranking" class="ativo">Ranking</a>
+      </nav>
+      <button type="button" class="pilula-prof" (click)="sair()" style="border: none; cursor: pointer;">
+        {{ alunoLogado?.personagem?.icone || '🧒' }} {{ alunoLogado?.nome || 'Aluno' }} · Sair
+      </button>
+    }
   </header>
 
   <main class="container-ranking">
     <div class="cabecalho-ranking">
-      <h1>Ranking</h1>
-      <p>Os melhores da turma!</p>
+      <h1>Ranking da Aula 🏆</h1>
+      <p>Estrelas conquistadas nesta aula!</p>
+
+      <!-- Seletor de Turma e Aula Encerrada para o Professor (P9) -->
+      @if (ehProfessor) {
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+          <select [(ngModel)]="turmaSelecionadaId" (change)="aoSelecionarTurma()" style="padding: 8px 14px; border-radius: 10px;">
+            @for (t of turmas; track t.id) {
+              <option [ngValue]="t.id">Turma: {{ t.nome }}</option>
+            }
+          </select>
+
+          <select [(ngModel)]="sessaoSelecionadaId" (change)="aoSelecionarSessao()" style="padding: 8px 14px; border-radius: 10px;">
+            @for (s of sessoesEncerradas; track s.id) {
+              <option [ngValue]="s.id">Aula #{{ s.id }} ({{ s.dataHoraFim | date:'dd/MM HH:mm' }})</option>
+            }
+          </select>
+        </div>
+      }
     </div>
 
     @if (!rankingDisponivel) {
       <div class="aviso-indisponivel">
-        <span class="icone-segredo">🤫</span>
+        <span class="icone-segredo">⏳</span>
         <h2>{{ mensagemIndisponivel }}</h2>
         <p>Continue completando as fases para ganhar ainda mais estrelas!</p>
       </div>
+    } @else if (ranking.length === 0) {
+      <div class="aviso-indisponivel">
+        <h2>Nenhum aluno pontuou nesta aula ainda.</h2>
+      </div>
     } @else {
-      <!-- Pódio Top 3 Idêntico à imagem telas principais.jpeg -->
+      <!-- Pódio Top 3 com Estrelas da Aula (Seção 5 - A7 e Seção 10 da Spec) -->
       <div class="podio-top3">
-        <!-- 2º Lugar (Azul) -->
         @if (segundo) {
           <div class="coluna-podio podio-segundo">
             <div class="avatar-podio">
               <div class="sprite-mascote" [style.background-position]="segundo.personagem.posX + ' ' + segundo.personagem.posY"></div>
             </div>
-            <div class="medalha-numero">2</div>
+            <div class="medalha-numero">{{ segundo.posicao }}</div>
             <h3>{{ segundo.nome }}</h3>
-            <span class="pontos-podio">{{ segundo.pontos }} pontos</span>
-            <div class="estrelas-podio">★★★★<span class="apagada">★</span></div>
+            <span class="pontos-podio">⭐ {{ segundo.estrelasNaSessao }} estrelas</span>
+            <small>Nível {{ segundo.nivelAlcancado }}</small>
           </div>
         }
 
-        <!-- 1º Lugar (Amarelo Ouro + Coroa) -->
         @if (primeiro) {
           <div class="coluna-podio podio-primeiro">
             <div class="coroa">👑</div>
             <div class="avatar-podio avatar-ouro">
               <div class="sprite-mascote" [style.background-position]="primeiro.personagem.posX + ' ' + primeiro.personagem.posY"></div>
             </div>
-            <div class="medalha-numero ouro">1</div>
+            <div class="medalha-numero ouro">{{ primeiro.posicao }}</div>
             <h3>{{ primeiro.nome }}</h3>
-            <span class="pontos-podio">{{ primeiro.pontos }} pontos</span>
-            <div class="estrelas-podio">★★★★★</div>
+            <span class="pontos-podio">⭐ {{ primeiro.estrelasNaSessao }} estrelas</span>
+            <small>Nível {{ primeiro.nivelAlcancado }}</small>
           </div>
         }
 
-        <!-- 3º Lugar (Rosa) -->
         @if (terceiro) {
           <div class="coluna-podio podio-terceiro">
             <div class="avatar-podio">
               <div class="sprite-mascote" [style.background-position]="terceiro.personagem.posX + ' ' + terceiro.personagem.posY"></div>
             </div>
-            <div class="medalha-numero">3</div>
+            <div class="medalha-numero">{{ terceiro.posicao }}</div>
             <h3>{{ terceiro.nome }}</h3>
-            <span class="pontos-podio">{{ terceiro.pontos }} pontos</span>
-            <div class="estrelas-podio">★★★★<span class="apagada">★</span></div>
+            <span class="pontos-podio">⭐ {{ terceiro.estrelasNaSessao }} estrelas</span>
+            <small>Nível {{ terceiro.nivelAlcancado }}</small>
           </div>
         }
       </div>
 
-      <!-- 4º e 5º Lugares em Linhas Horizontais -->
+      <!-- Demais posições -->
       <div class="lista-demais">
-        @for (aluno of demais; track aluno.id; let i = $index) {
+        @for (aluno of demais; track aluno.id) {
           <div class="linha-ranking">
             <div class="pos-esquerda">
-              <span class="num-pos">{{ i + 4 }}</span>
+              <span class="num-pos">{{ aluno.posicao }}º</span>
               <div class="avatar-mini" [style.background]="aluno.personagem.corFundo">
                 <div class="sprite-mascote" [style.background-position]="aluno.personagem.posX + ' ' + aluno.personagem.posY"></div>
               </div>
@@ -81,11 +113,11 @@
             </div>
 
             <div class="estrelas-centro">
-              ★★★★<span class="apagada">★</span>
+              Nível {{ aluno.nivelAlcancado }}
             </div>
 
             <div class="pontos-direita">
-              <strong>{{ aluno.pontos }} pontos</strong>
+              <strong>⭐ {{ aluno.estrelasNaSessao }} estrelas</strong>
             </div>
           </div>
         }

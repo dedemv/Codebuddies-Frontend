@@ -1,22 +1,31 @@
 <div class="pagina-home">
-  <!-- Bloco Hero Magenta idêntico à tela principal 2.jpeg -->
   <div class="hero-wrapper">
     <header class="navbar-codebuddies">
-      <a routerLink="/entrar" class="logo-box">
+      <a routerLink="/" class="logo-box">
         <img src="/img/logo-banner.png" alt="CodeBuddies" class="logo-img" />
       </a>
-      <nav class="nav-links">
-        <a routerLink="/entrar" class="ativo">Início</a>
-        <a routerLink="/professor/painel">Alunos</a>
-        <a routerLink="/mapa">Fases</a>
-        <a routerLink="/perfil">Progressos</a>
-        <a routerLink="/ranking">Ranking</a>
-      </nav>
-      <a routerLink="/professor/login" class="pilula-professor">
-        <span class="avatar-prof">👨‍🏫</span>
-        <span>Professor</span>
-        <span class="seta">⌄</span>
-      </a>
+
+      <!-- Menu oculta opções de professor quando aluno está logado (Seções 4 e 8 da Spec) -->
+      @if (alunoLogado) {
+        <nav class="nav-links">
+          <a routerLink="/" class="ativo">Início</a>
+          <a routerLink="/aluno/fases">Fases</a>
+          <a routerLink="/aluno/conquistas">Conquistas</a>
+          <a routerLink="/aluno/ranking">Ranking</a>
+        </nav>
+        <div class="pilula-professor" (click)="sair()" style="cursor: pointer;" title="Clique para sair">
+          <span class="avatar-prof">{{ alunoLogado.personagem?.icone || '🧒' }}</span>
+          <span>{{ alunoLogado.nome }} (Sair)</span>
+        </div>
+      } @else {
+        <nav class="nav-links">
+          <a routerLink="/" class="ativo">Início</a>
+        </nav>
+        <a routerLink="/professor/login" class="pilula-professor">
+          <span class="avatar-prof">👨‍🏫</span>
+          <span>Sou professor</span>
+        </a>
+      }
     </header>
 
     <section class="hero-content">
@@ -32,10 +41,15 @@
           de desafios, fases e muita brincadeira!
         </p>
 
-        <!-- Seção 3.1 do GUIA_FRONT: Aguardando professor iniciar a aula -->
-        @if (!sessaoAberta) {
+        @if (mensagemBoasVindas) {
+          <div class="alerta-sessao-fechada" style="background: #e8f5e9; color: #2e7d32;">
+            <strong>{{ mensagemBoasVindas }}</strong>
+          </div>
+        }
+
+        @if (!sessaoAberta && !alunoLogado) {
           <div class="alerta-sessao-fechada">
-            ⏳ <strong>Aguardando professor iniciar a aula.</strong>
+            ⏳ <strong>Aguardando o professor iniciar a aula.</strong>
             <span>A tela atualizará sozinha assim que a aula começar!</span>
           </div>
         } @else {
@@ -43,79 +57,114 @@
             <button type="button" class="btn-comecar" (click)="clicarComecarAventura()">
               Começar aventura <span class="seta-dir">→</span>
             </button>
-            <a routerLink="/mapa" class="btn-conhecer">Conhecer fases</a>
+            @if (alunoLogado) {
+              <a routerLink="/aluno/fases" class="btn-conhecer">Conhecer fases</a>
+            } @else {
+              <button type="button" class="btn-conhecer" (click)="clicarComecarAventura()">Conhecer fases</button>
+            }
           </div>
         }
       </div>
 
-      <!-- Ilustração dos Mascotes 3D à direita -->
       <div class="hero-arte">
-        <img src="/img/logo-banner.png" alt="Turma CodeBuddies" class="mascotes-hero-img" />
+        <img [src]="bannerSemFundoUrl" alt="Turma CodeBuddies" class="mascotes-hero-img" />
       </div>
     </section>
   </div>
 
-  <!-- Seção Inferior "Minha aventura" idêntica ao quadro 1 de telas principais.jpeg -->
-  <section class="secao-minha-aventura">
-    <div class="cabecalho-aventura">
-      <h2>Minha aventura</h2>
-      <div class="mascote-vamos-codar">
-        <span class="balao-fala">Vamos<br />codar?</span>
-        <div class="circulo-duck">
-          <div class="sprite-mascote" style="background-position: 50% 100%;"></div>
+  <!-- A2 — Seção "Minha aventura" com dados reais da API (Sem 245 ou 8/12 fixos!) -->
+  @if (alunoLogado) {
+    <section class="secao-minha-aventura">
+      <div class="cabecalho-aventura">
+        <h2>Minha aventura</h2>
+        <div class="mascote-vamos-codar">
+          <span class="balao-fala">Vamos<br />codar?</span>
+          <div class="circulo-duck">
+            <div class="sprite-mascote" style="background-position: 50% 100%;"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="grid-metricas-home">
-      <div class="card-stat">
-        <div class="icone-stat">⭐</div>
-        <strong>245</strong>
-        <span>ESTRELAS</span>
-      </div>
+      <div class="grid-metricas-home">
+        <div class="card-stat">
+          <div class="icone-stat">⭐</div>
+          <strong>{{ estrelasTotais }}</strong>
+          <span>ESTRELAS</span>
+        </div>
 
-      <div class="card-stat">
-        <div class="icone-stat">🏆</div>
-        <strong>1.280</strong>
-        <span>PONTOS</span>
-      </div>
+        <div class="card-stat">
+          <div class="icone-stat">🏆</div>
+          <strong>{{ pontosTotais }}</strong>
+          <span>PONTOS</span>
+        </div>
 
-      <div class="card-stat">
-        <div class="icone-stat">🚀</div>
-        <strong>8/12</strong>
-        <span>FASES</span>
-      </div>
+        <div class="card-stat">
+          <div class="icone-stat">🚀</div>
+          <strong>{{ fasesConcluidas }}/{{ totalFases }}</strong>
+          <span>FASES</span>
+        </div>
 
-      <div class="card-stat card-proximo-desafio" routerLink="/mapa">
-        <div class="icone-alvo">🎯</div>
-        <div>
-          <strong>Próximo desafio</strong>
-          <p>Loops e Repetições</p>
+        <div class="card-stat card-proximo-desafio" (click)="clicarComecarAventura()" style="cursor: pointer;">
+          <div class="icone-alvo">🎯</div>
+          <div>
+            <strong>Próximo desafio</strong>
+            @if (todasConcluidas) {
+              <p>Você completou tudo! 👑</p>
+            } @else if (proximaFase) {
+              <p>{{ proximaFase.titulo }} ({{ proximaFase.nivelTitulo }})</p>
+            } @else {
+              <p>Ver mapa de fases</p>
+            }
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  }
 
-  <!-- Modal Infantil para Nome + Idade (Seção 3.2 do GUIA_FRONT.md) -->
+  <!-- Rodapé discreto exigido na Seção 5 (A1) -->
+  @if (!alunoLogado) {
+    <footer style="text-align: center; padding: 1.5rem; opacity: 0.75;">
+      <a routerLink="/professor/login" style="color: inherit; text-decoration: underline;">Sou professor</a>
+    </footer>
+  }
+
+  <!-- Modal Infantil para Nome + Idade (4 a 15 anos conforme Seção 5 - A1) -->
   @if (mostrarModalEntrada) {
     <div class="modal-backdrop" (click)="mostrarModalEntrada = false">
       <div class="modal-entrada" (click)="$event.stopPropagation()">
         <button class="fechar-modal" (click)="mostrarModalEntrada = false">✕</button>
         <h2>Qual é o seu nome? 🚀</h2>
-        <p>Digite seu nome e idade para entrar na aventura!</p>
+        <p>Digite seu nome e escolha sua idade para entrar na aventura!</p>
 
         <form (ngSubmit)="entrar()">
           <div class="campo-form">
             <label>Seu nome</label>
-            <input type="text" [(ngModel)]="nome" name="nome" placeholder="Ex: Ana" autocomplete="off" />
+            <input
+              type="text"
+              [(ngModel)]="nome"
+              name="nome"
+              placeholder="Ex: Ana"
+              autocomplete="off"
+              autofocus />
             @if (erroNome) {
               <small class="erro-campo">{{ erroNome }}</small>
             }
           </div>
 
           <div class="campo-form">
-            <label>Sua idade (5 a 8 anos)</label>
-            <input type="number" [(ngModel)]="idade" name="idade" min="5" max="12" placeholder="Ex: 6" />
+            <label>Sua idade (4 a 15 anos)</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+              @for (idOpcao of idadesDisponiveis; track idOpcao) {
+                <button
+                  type="button"
+                  (click)="selecionarIdade(idOpcao)"
+                  [style.background]="idade === idOpcao ? '#ffca28' : '#f5f5f5'"
+                  [style.fontWeight]="idade === idOpcao ? 'bold' : 'normal'"
+                  style="padding: 8px 12px; border-radius: 10px; border: 2px solid #ddd; cursor: pointer; font-size: 1rem;">
+                  {{ idOpcao }}
+                </button>
+              }
+            </div>
             @if (erroIdade) {
               <small class="erro-campo">{{ erroIdade }}</small>
             }
@@ -125,7 +174,9 @@
             <div class="erro-geral">{{ erroMensagem }}</div>
           }
 
-          <button type="submit" class="btn-comecar btn-full">Entrar no Jogo →</button>
+          <button type="submit" class="btn-comecar btn-full" [disabled]="enviando">
+            {{ enviando ? 'Entrando...' : 'Entrar →' }}
+          </button>
         </form>
       </div>
     </div>

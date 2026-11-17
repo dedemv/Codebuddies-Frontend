@@ -1,35 +1,227 @@
 <div class="relatorio-container">
-  <div class="card-relatorio">
-    <h1>📊 Relatório Final da Sessão (RF-D11)</h1>
-    <p><strong>Turma:</strong> {{ turma }} | <strong>Total de Participantes:</strong> {{ alunos.length }} alunos</p>
-    <p><strong>Média de Estrelas da Turma:</strong> ⭐ {{ mediaEstrelas }}</p>
+  <!-- ========================================== -->
+  <!-- P6 — PROGRESSO INDIVIDUAL DO ALUNO         -->
+  <!-- ========================================== -->
+  @if (modoProgressoAluno && alunoDetalhe) {
+    <div class="card-relatorio">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h1>📊 Progresso de {{ alunoDetalhe.nome }}</h1>
+          <p>
+            🎂 {{ alunoDetalhe.idade }} anos ·
+            🏅 Nível: <strong>{{ nivelTituloAluno }}</strong> ·
+            ⭐ Estrelas: <strong>{{ conquistasAluno?.estrelasTotais ?? 0 }}</strong> ·
+            🚀 Fases concluídas: <strong>{{ conquistasAluno?.fasesConcluidas ?? 0 }} de {{ conquistasAluno?.totalFases ?? 0 }}</strong>
+          </p>
+        </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Aluno</th>
-          <th>Idade</th>
-          <th>Fases Concluídas</th>
-          <th>Total de Estrelas</th>
-          <th>Status na Sessão</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (a of alunos; track a.id) {
-          <tr>
-            <td>{{ a.nome }}</td>
-            <td>{{ a.idade }} anos</td>
-            <td>{{ a.fasesConcluidas }} / 3</td>
-            <td>⭐ {{ a.estrelasTotal }}</td>
-            <td>{{ a.ativo ? 'Ativo' : 'Desativado (Histórico Preservado)' }}</td>
-          </tr>
+        @if (todosAlunosTurma.length > 0) {
+          <select (change)="aoTrocarAlunoSelect($event)" [value]="alunoDetalhe.id" style="padding: 8px 14px; border-radius: 10px;">
+            @for (al of todosAlunosTurma; track al.id) {
+              <option [value]="al.id">{{ al.nome }} ({{ al.idade }} anos)</option>
+            }
+          </select>
         }
-      </tbody>
-    </table>
+      </div>
 
-    <div class="acoes">
-      <a routerLink="/professor/painel" class="btn">⬅️ Voltar ao Painel</a>
-      <a routerLink="/ranking" class="btn btn-ranking">🏆 Ver Ranking da Turma</a>
+      <div style="margin: 20px 0;">
+        <h3>Progresso Geral: {{ progressoGeralAluno }}%</h3>
+        <div style="background: #eee; height: 18px; border-radius: 10px; overflow: hidden; margin-bottom: 16px;">
+          <div [style.width.%]="progressoGeralAluno" style="background: #2196f3; height: 100%;"></div>
+        </div>
+
+        @for (b of barrasPorNivel; track b.titulo) {
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between;">
+              <strong>{{ b.titulo }}</strong>
+              <span>{{ b.percentual }}%</span>
+            </div>
+            <div style="background: #eee; height: 14px; border-radius: 8px; overflow: hidden;">
+              <div [style.width.%]="b.percentual" style="background: #9c27b0; height: 100%;"></div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (conquistasAluno?.conquistas?.length) {
+        <h3>🏅 Conquistas do Aluno ({{ conquistasAluno.totalConquistadas }} de {{ conquistasAluno.conquistas.length }})</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0;">
+          @for (c of conquistasAluno.conquistas; track c.codigo) {
+            <span
+              [style.opacity]="c.conquistada ? '1' : '0.4'"
+              style="padding: 8px 14px; border-radius: 10px; border: 1px solid #ddd; background: #fafafa;">
+              {{ c.conquistada ? c.icone : '🔒' }} {{ c.titulo }}
+            </span>
+          }
+        </div>
+      }
+
+      <div class="acoes" style="margin-top: 20px;">
+        <a routerLink="/professor/alunos" class="btn">⬅️ Voltar para Alunos</a>
+      </div>
     </div>
-  </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- P8 — RELATÓRIOS DA TURMA (4 BLOCOS)        -->
+  <!-- ========================================== -->
+  @if (!modoProgressoAluno) {
+    <div class="card-relatorio">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <h1>📊 Relatórios da Turma</h1>
+        <div>
+          <label style="font-weight: bold; margin-right: 8px;">Selecionar Turma:</label>
+          <select [(ngModel)]="turmaSelecionadaId" (change)="carregarQuatroBlocosRelatorio()" style="padding: 8px 14px; border-radius: 10px;">
+            @for (t of turmas; track t.id) {
+              <option [ngValue]="t.id">{{ t.nome }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- 1. Bloco Resumo -->
+      @if (resumoTurma) {
+        <h2>1. Resumo Geral — {{ resumoTurma.turma?.nome }}</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px;">
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Alunos (Ativos / Total)</small>
+            <div><strong>{{ resumoTurma.alunosAtivos }} / {{ resumoTurma.totalAlunos }}</strong></div>
+          </div>
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Aulas (Encerradas / Total)</small>
+            <div><strong>{{ resumoTurma.aulasEncerradas }} / {{ resumoTurma.totalAulas }}</strong></div>
+          </div>
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Tentativas</small>
+            <div><strong>{{ resumoTurma.totalTentativas }}</strong></div>
+          </div>
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Média de Estrelas</small>
+            <div><strong>⭐ {{ formatarValor(resumoTurma.mediaEstrelas) }}</strong></div>
+          </div>
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Média de Acertos</small>
+            <div><strong>{{ formatarValor(resumoTurma.mediaPercentual, '%') }}</strong></div>
+          </div>
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Maior / Menor %</small>
+            <div><strong>{{ formatarValor(resumoTurma.maiorPercentual, '%') }} / {{ formatarValor(resumoTurma.menorPercentual, '%') }}</strong></div>
+          </div>
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Tempo Médio</small>
+            <div><strong>{{ formatarValor(resumoTurma.tempoMedioSegundos, 's') }}</strong></div>
+          </div>
+          <div style="background: #f5f5f5; padding: 12px; border-radius: 10px;">
+            <small>Taxa de Aprovação</small>
+            <div><strong>{{ formatarValor(resumoTurma.taxaAprovacao, '%') }}</strong></div>
+          </div>
+        </div>
+      }
+
+      <!-- 2. Bloco Desempenho por Fase -->
+      <h2>2. Desempenho por Fase</h2>
+      <table style="margin-bottom: 24px;">
+        <thead>
+          <tr>
+            <th>Fase</th>
+            <th>Nível</th>
+            <th>Tentativas</th>
+            <th>Média Estrelas</th>
+            <th>Média %</th>
+            <th>Taxa Aprovação</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (f of desempenhoFases; track f.faseId) {
+            <tr>
+              <td>{{ f.ordem }}. {{ f.titulo }}</td>
+              <td>{{ f.nivelTitulo }}</td>
+              <td>{{ f.totalTentativas }}</td>
+              <td>{{ formatarValor(f.mediaEstrelas) }}</td>
+              <td>{{ formatarValor(f.mediaPercentual, '%') }}</td>
+              <td>{{ formatarValor(f.taxaAprovacao, '%') }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- 3. Bloco Boletim (Células null mostram "—") -->
+      @if (boletim) {
+        <h2>3. Boletim da Turma</h2>
+        <div style="overflow-x: auto; margin-bottom: 24px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Aluno</th>
+                <th>Status</th>
+                @for (f of boletim.fases; track f.faseId) {
+                  <th>F{{ f.ordem }} ({{ f.titulo }})</th>
+                }
+                <th>Total ⭐</th>
+                <th>Concluídas</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (linha of boletim.linhas; track linha.alunoId) {
+                <tr>
+                  <td>
+                    <a [routerLink]="['/professor/alunos', linha.alunoId]">{{ linha.nome }}</a>
+                  </td>
+                  <td>{{ linha.status }}</td>
+                  @for (est of linha.estrelas; track $index) {
+                    <td>{{ est === null || est === undefined ? '—' : ('⭐ ' + est) }}</td>
+                  }
+                  <td><strong>⭐ {{ linha.totalEstrelas }}</strong></td>
+                  <td>{{ linha.fasesConcluidas }} / {{ boletim.fases.length }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr style="background: #f5f5f5; font-weight: bold;">
+                <td colspan="2">Média por Fase</td>
+                @for (med of boletim.mediaPorFase; track $index) {
+                  <td>{{ formatarValor(med) }}</td>
+                }
+                <td colspan="2">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      }
+
+      <!-- 4. Bloco Desafios Mais Errados -->
+      <h2>4. Desafios Mais Errados (Top 5)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Fase</th>
+            <th>Enunciado</th>
+            <th>Resposta Correta</th>
+            <th>Erros / Respostas</th>
+            <th>Taxa de Erro</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of desafiosMaisErrados; track d.desafioId) {
+            <tr>
+              <td>{{ d.faseTitulo || '—' }}</td>
+              <td>{{ d.enunciado }}</td>
+              <td><strong>{{ d.respostaCorreta || '—' }}</strong></td>
+              <td>{{ d.erros }} / {{ d.respostas }}</td>
+              <td style="color: #c62828; font-weight: bold;">{{ formatarValor(d.taxaErro, '%') }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" style="text-align: center;">Nenhum erro registrado ainda.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="acoes" style="margin-top: 20px;">
+        <a routerLink="/professor" class="btn">⬅️ Voltar ao Painel</a>
+        <a routerLink="/professor/ranking" class="btn btn-ranking">🏆 Ver Ranking das Aulas</a>
+      </div>
+    </div>
+  }
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Sessao, Personagem } from '../../../core/services/sessao';
 
@@ -14,17 +14,27 @@ export class SelecaoPersonagem implements OnInit {
   totalEstrelas = 0;
   selecionado: Personagem | null = null;
 
-  constructor(private sessaoService: Sessao, private router: Router) {}
+  constructor(
+    private sessaoService: Sessao,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     const aluno = this.sessaoService.obterAlunoLogado();
     if (!aluno) {
-      this.router.navigate(['/entrar']);
+      this.router.navigate(['/']);
       return;
     }
     this.personagens = this.sessaoService.personagens;
-    this.totalEstrelas = this.sessaoService.obterTotalEstrelas();
     this.selecionado = aluno.personagem;
+
+    this.sessaoService.carregarConquistas().subscribe({
+      next: res => {
+        this.totalEstrelas = res?.estrelasTotais ?? 0;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   escolher(p: Personagem): void {
@@ -34,6 +44,6 @@ export class SelecaoPersonagem implements OnInit {
   }
 
   confirmar(): void {
-    this.router.navigate(['/mapa']);
+    this.router.navigate(['/aluno/inicio']);
   }
 }

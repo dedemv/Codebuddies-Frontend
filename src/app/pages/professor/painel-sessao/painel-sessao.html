@@ -1,126 +1,465 @@
 <div class="pagina-alunos">
-  <!-- Cabeçalho Magenta Oficial -->
+  <!-- Barra Rosa do Topo exclusiva do Professor (Seção 4 da Spec) -->
   <header class="navbar-codebuddies">
     <div class="logo">🎮 CODE<span class="amarelo">BUDDIES</span></div>
     <nav class="nav-links">
-      <a routerLink="/entrar">Início</a>
-      <a routerLink="/professor/painel" class="ativo">Alunos</a>
-      <a routerLink="/mapa">Fases</a>
-      <a routerLink="/perfil">Progressos</a>
-      <a routerLink="/ranking">Ranking</a>
+      <a (click)="trocarAba('painel', '/professor')" [class.ativo]="abaAtiva === 'painel'" style="cursor: pointer;">Início</a>
+      <a (click)="trocarAba('alunos', '/professor/alunos')" [class.ativo]="abaAtiva === 'alunos'" style="cursor: pointer;">Alunos</a>
+      <a (click)="trocarAba('fases', '/professor/fases')" [class.ativo]="abaAtiva === 'fases'" style="cursor: pointer;">Fases</a>
+      <a routerLink="/professor/relatorios">Relatórios</a>
+      <a routerLink="/professor/ranking">Ranking</a>
+      <a (click)="trocarAba('turmas', '/professor/turmas')" [class.ativo]="abaAtiva === 'turmas'" style="cursor: pointer;">Turmas</a>
+      <a (click)="trocarAba('aulas', '/professor/aulas')" [class.ativo]="abaAtiva === 'aulas'" style="cursor: pointer;">Aulas</a>
+      <a (click)="trocarAba('professores', '/professor/professores')" [class.ativo]="abaAtiva === 'professores'" style="cursor: pointer;">Professores</a>
     </nav>
-    <a routerLink="/professor/relatorio" class="pilula-prof">📊 Relatório Final</a>
+    <button type="button" class="pilula-prof" (click)="sair()" style="border: none; cursor: pointer;">
+      👨‍🏫 {{ professorLogado?.nome || 'Professor' }} · Sair
+    </button>
   </header>
 
   <main class="container-alunos">
-    <!-- Cabeçalho da Seção Alunos -->
-    <div class="topo-secao">
-      <div>
-        <h1>Alunos</h1>
-        <p>
-          Gerencie os alunos da sua turma ({{ nomeTurma }}) —
-          <strong>{{ sessaoAberta ? '🟢 Aula Aberta' : '🔴 Aula Fechada' }}</strong>
-        </p>
+    @if (mensagemToast) {
+      <div style="background: #e8f5e9; color: #2e7d32; padding: 12px 18px; border-radius: 12px; margin-bottom: 16px; font-weight: bold;">
+        ✅ {{ mensagemToast }}
+      </div>
+    }
+    @if (erroToast) {
+      <div style="background: #ffebee; color: #c62828; padding: 12px 18px; border-radius: 12px; margin-bottom: 16px; font-weight: bold;">
+        ⚠️ {{ erroToast }}
+      </div>
+    }
+
+    <!-- ========================================== -->
+    <!-- P2 — INÍCIO DO PROFESSOR (PAINEL DA AULA)  -->
+    <!-- ========================================== -->
+    @if (abaAtiva === 'painel') {
+      <div class="topo-secao">
+        <div>
+          <h1>Painel da Aula 🏫</h1>
+          <p>Gerencie a aula em andamento para que os alunos possam entrar.</p>
+        </div>
       </div>
 
-      <div class="botoes-sessao">
-        @if (!sessaoAberta) {
-          <button type="button" class="btn-abrir-aula" (click)="criarEAbrirSessao()">
-            ▶️ Abrir Sessão de Aula
-          </button>
-        } @else {
-          @if (!confirmandoEncerramento) {
-            <button type="button" class="btn-encerrar" (click)="confirmandoEncerramento = true">
-              ⏹️ Encerrar Aula
-            </button>
-          } @else {
-            <button type="button" class="btn-confirmar" (click)="confirmarEncerramento()">Confirmar Fim</button>
-            <button type="button" class="btn-cancelar" (click)="confirmandoEncerramento = false">Cancelar</button>
-          }
-        }
-        <button type="button" class="btn-roxo" (click)="abrirModalNovoAluno()">+ Novo aluno</button>
-      </div>
-    </div>
-
-    <!-- Barra de Busca e Filtro -->
-    <div class="barra-filtros">
-      <div class="input-busca">
-        <span>🔍</span>
-        <input 
-          type="text" 
-          [(ngModel)]="termoBusca" 
-          placeholder="Buscar aluno..." />
-      </div>
-
-      <select [(ngModel)]="filtroStatus" class="select-filtro">
-        <option value="todos">Todos</option>
-        <option value="ativos">Ativos</option>
-        <option value="inativos">Desativados</option>
-      </select>
-    </div>
-
-    <!-- Lista de Cards de Alunos com Barra de Progresso -->
-    <div class="lista-cards-alunos">
-      @for (a of alunosFiltrados; track a.id) {
-        <div class="card-aluno-item" [class.inativo]="!a.ativo">
-          <div class="info-esquerda">
-            <div class="avatar-aluno" [style.background]="a.personagem.corFundo">
-              {{ a.personagem.icone }}
-            </div>
+      @if (sessaoAberta) {
+        <div style="background: #fff; padding: 24px; border-radius: 18px; border: 3px solid #4caf50; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
-              <h3>{{ a.nome }}</h3>
-              <span class="idade-aluno">{{ a.idade }} anos</span>
-              <span class="tag-cargo">⚙️ {{ a.cargoNivel }}</span>
+              <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-weight: bold;">🟢 AULA EM ANDAMENTO</span>
+              <h2 style="margin-top: 8px;">Aula #{{ sessaoAberta.id }} — Turma ID {{ sessaoAberta.turmaId }}</h2>
+              <p>Alunos presentes na aula ({{ alunosNaSessaoAberta.length }}): atualiza automaticamente a cada 10s.</p>
+            </div>
+
+            <div>
+              @if (!confirmandoEncerramento) {
+                <button type="button" class="btn-encerrar" (click)="confirmandoEncerramento = true">
+                  ⏹️ Encerrar aula
+                </button>
+              } @else {
+                <div style="background: #fff3e0; padding: 12px; border-radius: 12px; display: flex; gap: 8px; align-items: center;">
+                  <span>Os alunos não poderão mais jogar nesta aula. Confirmar?</span>
+                  <button type="button" class="btn-confirmar" (click)="confirmarEncerramento()">Sim, encerrar</button>
+                  <button type="button" class="btn-cancelar" (click)="confirmandoEncerramento = false">Cancelar</button>
+                </div>
+              }
             </div>
           </div>
 
-          <div class="progresso-centro">
-            <div class="estrelas-mini">
-              ★★★★<span class="apagada">★</span>
-            </div>
-            <div class="linha-barra-pct">
-              <div class="trilho-aluno">
-                <div class="preenchimento-aluno" [style.width.%]="a.progressoPct"></div>
-              </div>
-              <strong class="pct-texto">{{ a.progressoPct }}%</strong>
-            </div>
+          <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
+            @for (al of alunosNaSessaoAberta; track al.id) {
+              <span style="background: #f5f5f5; padding: 8px 14px; border-radius: 12px; font-weight: bold;">
+                🧒 {{ al.nome }} ({{ al.idade }} anos)
+              </span>
+            } @empty {
+              <p style="opacity: 0.7;">Aguardando os alunos entrarem com nome e idade...</p>
+            }
           </div>
+        </div>
+      } @else {
+        <div style="background: #fff; padding: 24px; border-radius: 18px; margin-bottom: 24px;">
+          <h2>Nenhuma aula aberta no momento</h2>
+          <p>Escolha uma turma abaixo para criar e abrir uma nova aula:</p>
 
-          <div class="acoes-direita">
-            <button type="button" class="btn-status-toggle" (click)="alternarStatus(a.id)">
-              {{ a.ativo ? '🚫 Desativar' : '✅ Reativar' }}
+          <div style="display: flex; gap: 12px; align-items: center; margin-top: 14px; flex-wrap: wrap;">
+            <select [(ngModel)]="turmaParaNovaAulaId" class="select-filtro">
+              @for (t of turmas; track t.id) {
+                @if (t.ativa !== false) {
+                  <option [ngValue]="t.id">{{ t.nome }}</option>
+                }
+              }
+            </select>
+            <button type="button" class="btn-abrir-aula" (click)="criarEAbrirSessao()">
+              ▶️ Nova aula (Criar e Abrir)
             </button>
-            <a routerLink="/perfil" class="btn-ver">Ver &gt;</a>
+          </div>
+
+          @if (sessoesCriadas.length > 0) {
+            <div style="margin-top: 20px;">
+              <h3>Aulas criadas aguardando abertura:</h3>
+              @for (sc of sessoesCriadas; track sc.id) {
+                <div style="display: flex; gap: 12px; align-items: center; margin-top: 8px;">
+                  <span>Aula #{{ sc.id }} (Turma {{ sc.turmaId }})</span>
+                  <button type="button" class="btn-roxo" (click)="abrirAulaExistente(sc.id)">Abrir aula</button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (rankingEncerramento) {
+        <div style="background: #fff8e1; padding: 20px; border-radius: 16px;">
+          <h3>🏆 Ranking Final da Aula Encerrada</h3>
+          @for (item of rankingEncerramento; track item.alunoId) {
+            <div style="padding: 8px 0; border-bottom: 1px solid #eee;">
+              <strong>{{ item.posicao }}º {{ item.nome }}</strong> — ⭐ {{ item.estrelasNaSessao }} estrelas (Nível {{ item.nivelAlcancado }})
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- ========================================== -->
+    <!-- P5 — ALUNOS (Sem botão "+ Novo aluno"!)    -->
+    <!-- ========================================== -->
+    @if (abaAtiva === 'alunos') {
+      <div class="topo-secao">
+        <div>
+          <h1>Alunos</h1>
+          <p>Os alunos são cadastrados automaticamente ao entrarem na aula com nome e idade.</p>
+        </div>
+
+        <div>
+          <label style="font-weight: bold; margin-right: 8px;">Turma:</label>
+          <select [(ngModel)]="turmaSelecionadaId" (change)="carregarAlunosComBoletim()" class="select-filtro">
+            @for (t of turmas; track t.id) {
+              <option [ngValue]="t.id">{{ t.nome }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="barra-filtros">
+        <div class="input-busca">
+          <span>🔍</span>
+          <input type="text" [(ngModel)]="termoBusca" placeholder="Buscar aluno..." />
+        </div>
+
+        <select [(ngModel)]="filtroStatus" class="select-filtro">
+          <option value="todos">Todos</option>
+          <option value="ativos">Ativos</option>
+          <option value="inativos">Desativados</option>
+        </select>
+      </div>
+
+      <div class="lista-cards-alunos">
+        @for (a of alunosFiltrados; track a.id) {
+          <div class="card-aluno-item" [class.inativo]="!a.ativo">
+            <div class="info-esquerda">
+              <div class="avatar-aluno" [style.background]="a.personagem.corFundo">
+                {{ a.personagem.icone }}
+              </div>
+              <div>
+                <h3>{{ a.nome }}</h3>
+                <span class="idade-aluno">{{ a.idade }} anos</span>
+                <span class="tag-cargo">⚙️ {{ a.cargoNivel }}</span>
+              </div>
+            </div>
+
+            <div class="progresso-centro">
+              <div class="estrelas-mini">
+                ⭐ {{ a.estrelasTotal }} estrelas
+              </div>
+              <div class="linha-barra-pct">
+                <div class="trilho-aluno">
+                  <div class="preenchimento-aluno" [style.width.%]="a.progressoPct"></div>
+                </div>
+                <strong class="pct-texto">{{ a.progressoPct }}%</strong>
+              </div>
+            </div>
+
+            <div class="acoes-direita">
+              <button type="button" class="btn-status-toggle" (click)="abrirEdicaoAluno(a)">
+                ✏️ Editar
+              </button>
+              <button type="button" class="btn-status-toggle" (click)="alternarStatusAluno(a)">
+                {{ a.ativo ? '🚫 Desativar' : '✅ Reativar' }}
+              </button>
+              <a [routerLink]="['/professor/alunos', a.id]" class="btn-ver">Ver &gt;</a>
+            </div>
+          </div>
+        } @empty {
+          <p style="text-align: center; padding: 24px;">Nenhum aluno encontrado nesta turma.</p>
+        }
+      </div>
+
+      @if (alunoEditando) {
+        <div class="modal-backdrop" (click)="alunoEditando = null">
+          <div class="modal-novo-aluno" (click)="$event.stopPropagation()">
+            <h2>Editar Aluno ✏️</h2>
+            <form (ngSubmit)="salvarEdicaoAluno()">
+              <label>Nome</label>
+              <input type="text" [(ngModel)]="alunoEditando.nome" name="nomeEdit" required />
+              <label>Idade (4 a 15)</label>
+              <input type="number" [(ngModel)]="alunoEditando.idade" name="idadeEdit" min="4" max="15" required />
+              <div class="acoes-modal">
+                <button type="button" class="btn-cancelar" (click)="alunoEditando = null">Cancelar</button>
+                <button type="submit" class="btn-roxo">Salvar</button>
+              </div>
+            </form>
           </div>
         </div>
       }
-    </div>
-  </main>
+    }
 
-  <!-- Modal para Cadastrar Novo Aluno sem sair da página -->
-  @if (mostrarModalNovoAluno) {
-    <div class="modal-backdrop" (click)="mostrarModalNovoAluno = false">
-      <div class="modal-novo-aluno" (click)="$event.stopPropagation()">
-        <h2>Cadastrar Novo Aluno 👧👦</h2>
-        <p>Adicione um aluno diretamente na turma atual:</p>
+    <!-- ========================================== -->
+    <!-- P3 — TURMAS                                -->
+    <!-- ========================================== -->
+    @if (abaAtiva === 'turmas') {
+      <div class="topo-secao">
+        <div>
+          <h1>Turmas 📚</h1>
+          <p>Gerencie as turmas da escola (turmas não são apagadas para manter o histórico).</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" [(ngModel)]="novaTurmaNome" placeholder="Nome da nova turma..." style="padding: 10px; border-radius: 10px; border: 1px solid #ccc;" />
+          <button type="button" class="btn-roxo" (click)="criarTurma()">+ Nova turma</button>
+        </div>
+      </div>
 
-        <form (ngSubmit)="salvarNovoAluno()">
-          <label>Nome do Aluno</label>
-          <input type="text" [(ngModel)]="novoAlunoNome" name="novoAlunoNome" placeholder="Ex: Gabriel" />
+      <div class="lista-cards-alunos">
+        @for (t of turmas; track t.id) {
+          <div class="card-aluno-item" [class.inativo]="t.ativa === false">
+            <div>
+              @if (turmaEditandoId === t.id) {
+                <input type="text" [(ngModel)]="turmaEditandoNome" style="padding: 6px; border-radius: 8px;" />
+                <button type="button" class="btn-confirmar" (click)="salvarEdicaoTurma(t.id)" style="margin-left: 6px;">Salvar</button>
+              } @else {
+                <h3>{{ t.nome }}</h3>
+                <small>Status: {{ t.ativa !== false ? 'Ativa' : 'Desativada' }}</small>
+              }
+            </div>
+            <div class="acoes-direita">
+              <button type="button" class="btn-status-toggle" (click)="iniciarEdicaoTurma(t)">✏️ Editar nome</button>
+              <button type="button" class="btn-status-toggle" (click)="alternarAtivaTurma(t)">
+                {{ t.ativa !== false ? '🚫 Desativar' : '✅ Reativar' }}
+              </button>
+              <button type="button" class="btn-ver" (click)="verAlunosDaTurma(t.id)">Ver alunos &gt;</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
-          <label>Idade</label>
-          <input type="number" [(ngModel)]="novoAlunoIdade" name="novoAlunoIdade" min="5" max="12" />
+    <!-- ========================================== -->
+    <!-- P4 — AULAS                                 -->
+    <!-- ========================================== -->
+    @if (abaAtiva === 'aulas') {
+      <div class="topo-secao">
+        <div>
+          <h1>Histórico de Aulas 🗓️</h1>
+          <p>Filtre por turma e status (CRIADA, ABERTA, ENCERRADA).</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <select [(ngModel)]="filtroAulaTurmaId" (change)="carregarListaAulas()" class="select-filtro">
+            <option value="">Todas as turmas</option>
+            @for (t of turmas; track t.id) {
+              <option [ngValue]="t.id">{{ t.nome }}</option>
+            }
+          </select>
+          <select [(ngModel)]="filtroAulaStatus" (change)="carregarListaAulas()" class="select-filtro">
+            <option value="">Todos os status</option>
+            <option value="CRIADA">CRIADA</option>
+            <option value="ABERTA">ABERTA</option>
+            <option value="ENCERRADA">ENCERRADA</option>
+          </select>
+        </div>
+      </div>
 
-          @if (erroNovoAluno) {
-            <p class="erro-modal">{{ erroNovoAluno }}</p>
+      <div class="lista-cards-alunos">
+        @for (s of listaAulas; track s.id) {
+          <div class="card-aluno-item">
+            <div>
+              <h3>Aula #{{ s.id }} — Turma {{ s.turmaId }}</h3>
+              <span
+                [style.background]="s.status === 'ABERTA' ? '#e8f5e9' : s.status === 'ENCERRADA' ? '#e3f2fd' : '#eeeeee'"
+                style="padding: 4px 10px; border-radius: 10px; font-weight: bold; font-size: 0.85rem;">
+                {{ s.status }}
+              </span>
+            </div>
+            <div class="acoes-direita">
+              @if (s.status === 'CRIADA') {
+                <button type="button" class="btn-abrir-aula" (click)="abrirAulaExistente(s.id)">Abrir aula</button>
+              }
+              @if (s.status === 'ENCERRADA') {
+                <a routerLink="/professor/ranking" class="btn-ver">🏆 Ranking</a>
+              }
+              <button type="button" class="btn-status-toggle" (click)="verDetalheAula(s)">Detalhes</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (aulaDetalhe) {
+        <div style="background: #fff; padding: 20px; border-radius: 16px; margin-top: 20px;">
+          <h3>Detalhes da Aula #{{ aulaDetalhe.id }} ({{ alunosAulaDetalhe.length }} alunos)</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+            @for (al of alunosAulaDetalhe; track al.id) {
+              <span style="background: #f5f5f5; padding: 6px 12px; border-radius: 10px;">{{ al.nome }}</span>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- ========================================== -->
+    <!-- P7 — CONTEÚDO (NÍVEIS, FASES E DESAFIOS)   -->
+    <!-- ========================================== -->
+    @if (abaAtiva === 'fases') {
+      <div class="topo-secao">
+        <div>
+          <h1>Gerenciar Conteúdo (Níveis, Fases e Desafios) 🎯</h1>
+          <p>Crie e edite níveis, fases e desafios do jogo.</p>
+        </div>
+      </div>
+
+      <!-- Bloco Níveis -->
+      <div style="background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px;">
+        <h3>1. Níveis ({{ niveis.length }})</h3>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0;">
+          <input type="text" [(ngModel)]="novoNivel.titulo" placeholder="Título do nível..." style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <input type="text" [(ngModel)]="novoNivel.descricao" placeholder="Descrição (opcional)" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <input type="number" [(ngModel)]="novoNivel.ordem" placeholder="Ordem" style="width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <button type="button" class="btn-roxo" (click)="salvarNovoNivel()">+ Novo nível</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          @for (n of niveis; track n.id) {
+            <div style="background: #f5f5f5; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; gap: 10px;">
+              <strong>{{ n.ordem }}. {{ n.titulo }}</strong>
+              <button type="button" (click)="removerNivel(n.id)" style="border: none; background: transparent; cursor: pointer; color: #c62828;">🗑️</button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Bloco Fases -->
+      <div style="background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px;">
+        <h3>2. Fases ({{ fasesConteudo.length }})</h3>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0;">
+          <select [(ngModel)]="novaFase.nivelId" style="padding: 8px; border-radius: 8px;">
+            @for (n of niveis; track n.id) {
+              <option [ngValue]="n.id">Nível {{ n.ordem }}: {{ n.titulo }}</option>
+            }
+          </select>
+          <input type="text" [(ngModel)]="novaFase.titulo" placeholder="Título da fase..." style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <select [(ngModel)]="novaFase.tipo" style="padding: 8px; border-radius: 8px;">
+            <option value="DIGITACAO">DIGITACAO</option>
+            <option value="LOGICA">LOGICA</option>
+            <option value="COMPUTACAO_BASICA">COMPUTACAO_BASICA</option>
+          </select>
+          <input type="number" [(ngModel)]="novaFase.ordem" placeholder="Ordem" style="width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <button type="button" class="btn-roxo" (click)="salvarNovaFase()">+ Nova fase</button>
+        </div>
+
+        <div class="lista-cards-alunos">
+          @for (f of fasesConteudo; track f.id) {
+            <div class="card-aluno-item">
+              <div>
+                <h3>Fase {{ f.ordem }}: {{ f.titulo }}</h3>
+                <small>Tipo: {{ f.tipo }} · Nível ID: {{ f.nivelId }}</small>
+                @if (f.totalDesafios === 0) {
+                  <span style="background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 8px; font-weight: bold; margin-left: 8px;">
+                    ⚠️ Incompleta (Sem desafios)
+                  </span>
+                }
+              </div>
+              <div class="acoes-direita">
+                <button type="button" class="btn-ver" (click)="abrirDesafiosDaFase(f)">Gerenciar Desafios ({{ f.desafios?.length ?? '?' }})</button>
+                <button type="button" class="btn-status-toggle" (click)="removerFase(f.id)">🗑️ Excluir</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Bloco Desafios da Fase Selecionada (Inclui respostaCorreta visível apenas para o Professor) -->
+      @if (faseSelecionadaDetalhe) {
+        <div style="background: #fff8e1; padding: 20px; border-radius: 16px;">
+          <h3>3. Desafios da Fase: {{ faseSelecionadaDetalhe.titulo }}</h3>
+          @if (desafiosDaFase.length === 0) {
+            <p style="color: #c62828; font-weight: bold;">⚠️ Fase Incompleta: adicione desafios para que os alunos possam jogá-la.</p>
           }
 
-          <div class="acoes-modal">
-            <button type="button" class="btn-cancelar" (click)="mostrarModalNovoAluno = false">Cancelar</button>
-            <button type="submit" class="btn-roxo">Salvar Aluno</button>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0;">
+            <input type="text" [(ngModel)]="novoDesafio.enunciado" placeholder="Enunciado (ex: Qual comando acende? (LUZ ou TV))" style="flex: 1; padding: 8px; border-radius: 8px;" />
+            <input type="text" [(ngModel)]="novoDesafio.respostaCorreta" placeholder="Resposta correta" style="padding: 8px; border-radius: 8px;" />
+            <input type="number" [(ngModel)]="novoDesafio.pontos" placeholder="Pontos" style="width: 90px; padding: 8px; border-radius: 8px;" />
+            <button type="button" class="btn-roxo" (click)="salvarNovoDesafio()">+ Novo desafio</button>
           </div>
-        </form>
+
+          @for (d of desafiosDaFase; track d.id) {
+            <div style="background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>#{{ d.ordem }}: {{ d.enunciado }}</strong>
+                <div style="color: #2e7d32; font-weight: bold;">✅ Resposta Correta: {{ d.respostaCorreta }} ({{ d.pontos }} pts)</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn-status-toggle" (click)="desafioEditando = { ...d }">✏️ Editar</button>
+                <button type="button" class="btn-status-toggle" (click)="removerDesafio(d.id)">🗑️</button>
+              </div>
+            </div>
+          }
+
+          @if (desafioEditando) {
+            <div style="background: #fff; padding: 14px; border-radius: 12px; border: 2px solid #9c27b0; margin-top: 12px;">
+              <h4>Editando Desafio #{{ desafioEditando.ordem }}</h4>
+              <input type="text" [(ngModel)]="desafioEditando.enunciado" style="width: 100%; padding: 8px; margin: 6px 0;" />
+              <input type="text" [(ngModel)]="desafioEditando.respostaCorreta" style="padding: 8px; margin-right: 8px;" />
+              <input type="number" [(ngModel)]="desafioEditando.pontos" style="width: 90px; padding: 8px;" />
+              <button type="button" class="btn-confirmar" (click)="salvarEdicaoDesafio()" style="margin-left: 8px;">Salvar</button>
+              <button type="button" class="btn-cancelar" (click)="desafioEditando = null" style="margin-left: 6px;">Cancelar</button>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- ========================================== -->
+    <!-- P10 — PROFESSORES (Sem coluna "Alunos: 12") -->
+    <!-- ========================================== -->
+    @if (abaAtiva === 'professores') {
+      <div class="topo-secao">
+        <div>
+          <h1>Professores 👨‍🏫👩‍🏫</h1>
+          <p>Cadastre e gerencie a equipe de professores.</p>
+        </div>
       </div>
-    </div>
-  }
+
+      <div style="background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px;">
+        <h3>+ Novo professor</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+          <input type="text" [(ngModel)]="novoProf.nome" placeholder="Nome" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <input type="email" [(ngModel)]="novoProf.email" placeholder="E-mail" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <input type="password" [(ngModel)]="novoProf.senha" placeholder="Senha (mín. 8 caracteres)" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
+          <button type="button" class="btn-roxo" (click)="cadastrarProfessor()">Cadastrar</button>
+        </div>
+      </div>
+
+      <div class="lista-cards-alunos">
+        @for (p of professores; track p.id) {
+          <div class="card-aluno-item">
+            <div>
+              <h3>{{ p.nome }}</h3>
+              <p style="margin: 4px 0;">📧 {{ p.email }}</p>
+            </div>
+            <div>
+              <span style="background: #e8f5e9; color: #2e7d32; padding: 6px 12px; border-radius: 12px; font-weight: bold;">
+                {{ p.ativo === false ? 'Desativado' : 'Ativo' }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </main>
 </div>

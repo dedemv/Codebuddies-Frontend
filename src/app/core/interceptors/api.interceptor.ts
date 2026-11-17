@@ -1,43 +1,65 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { Sessao } from '../services/sessao';
+
+const ROTAS_PUBLICAS = [
+  '/api/health',
+  '/api/sessoes/aberta',
+  '/api/auth/aluno/entrar',
+  '/api/auth/professor/login'
+];
 
 export const apiInterceptor: HttpInterceptorFn = (req, next) => {
+  const sessao = inject(Sessao);
   const router = inject(Router);
-  const isBrowser = typeof window !== 'undefined' && typeof sessionStorage !== 'undefined';
 
-  const tokenAluno = isBrowser ? sessionStorage.getItem('cb_token_aluno') : null;
-  const tokenProf = isBrowser ? sessionStorage.getItem('cb_token_professor') : null;
+  const isPublica = ROTAS_PUBLICAS.some(rota => req.url.endsWith(rota));
+  const token = sessao.token;
 
-  const isRotaProfessor =
-    req.url.includes('/professor') ||
-    req.url.includes('/turmas') ||
-    req.url.includes('/sessoes') ||
-    req.url.includes('/alunos') ||
-    req.url.includes('/relatorios');
+  if (!isPublica && token) {
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+  }
 
-  const token = isRotaProfessor ? (tokenProf || tokenAluno) : (tokenAluno || tokenProf);
-
-  const authReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
-
-  return next(authReq).pipe(
+  return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
-      const code = err?.error?.error?.code;
+      const apiErr = err.error?.error;
+      const code: string | undefined = apiErr?.code;
 
-      if (isBrowser) {
-        // Só redireciona para /entrar se for uma rota exclusiva do jogo do aluno (/api/jogo/...)
-        if (
-          req.url.includes('/jogo/') &&
-          (code === 'NAO_AUTENTICADO' || code === 'TOKEN_INVALIDO' || code === 'ALUNO_FORA_DA_SESSAO')
-        ) {
-          sessionStorage.removeItem('cb_token_aluno');
-          router.navigate(['/entrar']);
-        } else if (code === 'FASE_BLOQUEADA') {
-          router.navigate(['/mapa']);
+      switch (code) {
+        case 'NAO_AUTENTICADO':
+        case 'TOKEN_INVALIDO':
+        case 'ALUNO_FORA_DA_SESSAO': {
+          const eraProfessor = sessao.perfil === 'PROFESSOR';
+          sessao.limparSessao();
+          router.navigate([eraProfessor ? '/professor/login' : '/']);
+          break;
         }
+
+        case 'SEM_PERMISSAO':
+          router.navigate([sessao.perfil === 'PROFESSOR' ? '/professor' : '/aluno/inicio']);
+          break;
+
+        case 'SESSAO_FECHADA':
+          if (sessao.perfil === 'ALUNO') {
+            sessao.limparSessao();
+            router.navigate(['/']);
+          }
+          break;
+
+        case 'FASE_BLOQUEADA':
+        case 'FASE_SEM_DESAFIOS':
+          router.navigate(['/aluno/fases']);
+          break;
+
+        case 'JSON_INVALIDO':
+        case 'DESAFIO_FORA_DA_FASE':
+        case 'RESPOSTA_DUPLICADA':
+          console.error('[Erro de Contrato do Front]:', apiErr);
+          break;
       }
 
       return throwError(() => err);

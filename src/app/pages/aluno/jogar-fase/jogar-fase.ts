@@ -1,30 +1,29 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Sessao, Fase, DesafioJogo } from '../../../core/services/sessao';
+import { Sessao, DesafioJogo } from '../../../core/services/sessao';
 
 @Component({
   selector: 'app-jogar-fase',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './jogar-fase.html',
   styleUrl: './jogar-fase.css'
 })
 export class JogarFase implements OnInit {
   faseId = 1;
-  faseAtual?: Fase;
+  faseAtual: any = null;
   tituloFase = '';
   desafios: DesafioJogo[] = [];
   indiceAtual = 0;
 
-  acertosParciais = 0;
-  errosParciais = 0;
-  respostasAluno: { desafioId: number; resposta: string; acertou: boolean }[] = [];
+  respostaDigitada = '';
+  respostasAluno: { desafioId: number; resposta: string }[] = [];
   inicioTimestamp = 0;
 
-  feedback: 'acerto' | 'erro' | null = null;
-  mensagemFeedback = '';
-  respostaSelecionada = '';
+  carregando = true;
+  enviando = false;
   resultadoFinal: any = null;
   erroFase = '';
 
@@ -38,30 +37,45 @@ export class JogarFase implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.faseId = Number(params.get('id') || 1);
-      this.iniciarFase();
+      const naRotaResultado = this.router.url.endsWith('/resultado');
+      const salvo = this.sessaoService.ultimoResultadoTentativa();
+
+      if (naRotaResultado && salvo && salvo.faseId === this.faseId) {
+        this.resultadoFinal = salvo;
+        this.carregando = false;
+        this.cdr.detectChanges();
+      } else {
+        this.iniciarFase();
+      }
     });
   }
 
   iniciarFase(): void {
     this.indiceAtual = 0;
-    this.acertosParciais = 0;
-    this.errosParciais = 0;
+    this.respostaDigitada = '';
     this.respostasAluno = [];
     this.resultadoFinal = null;
-    this.feedback = null;
-    this.mensagemFeedback = '';
-    this.respostaSelecionada = '';
     this.erroFase = '';
+    this.carregando = true;
+    this.enviando = false;
     this.inicioTimestamp = Date.now();
 
     this.sessaoService.obterFaseComDesafios(this.faseId).subscribe({
       next: (res) => {
         this.faseAtual = res.fase;
-        this.tituloFase = `${res.fase.subtitulo}: ${res.fase.titulo}`;
+        const ordem = String(res.fase?.ordem ?? this.faseId).padStart(2, '0');
+        this.tituloFase = `FASE ${ordem}: ${res.fase?.titulo || ''}`;
         this.desafios = res.desafios || [];
+        this.carregando = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
+        this.carregando = false;
+        const code = err?.error?.error?.code;
+        if (code === 'FASE_BLOQUEADA') {
+          this.router.navigate(['/aluno/fases']);
+          return;
+        }
         this.erroFase = err?.error?.error?.message || 'Esta fase ainda não está pronta.';
         this.cdr.detectChanges();
       }
@@ -73,80 +87,98 @@ export class JogarFase implements OnInit {
   }
 
   get progressoPct(): number {
-    return this.desafios.length ? Math.round((this.indiceAtual / this.desafios.length) * 100) : 0;
+    return this.desafios.length ? Math.round(((this.indiceAtual + 1) / this.desafios.length) * 100) : 0;
   }
 
+  // Seção 5 (A4) e Seção 11: Para DIGITACAO captura tecla; Enter confirma resposta
   @HostListener('window:keydown', ['$event'])
   aoPressionarTecla(event: KeyboardEvent): void {
-    if (this.resultadoFinal || this.feedback || !this.desafioAtual) return;
-    if (this.faseId === 1) {
-      const tecla = event.key.toUpperCase();
-      if (/^[A-Z0-9]$/.test(tecla)) {
-        this.responder(tecla);
+    if (this.resultadoFinal || this.carregando || this.enviando || !this.desafioAtual) return;
+
+    const tag = (event.target as HTMLElement)?.tagName;
+    if (event.key === 'Enter' && this.respostaDigitada.trim() !== '') {
+      event.preventDefault();
+      this.confirmarProximo();
+      return;
+    }
+
+    if (this.faseAtual?.tipo === 'DIGITACAO' && tag !== 'INPUT') {
+      if (event.key.length === 1 && /^[a-zA-Z0-9]$/.test(event.key)) {
+        this.respostaDigitada = event.key.toUpperCase();
+        this.cdr.detectChanges();
       }
     }
   }
 
-  responder(valor: string): void {
-    if (this.feedback || !this.desafioAtual || this.resultadoFinal) return;
+  selecionarOpcao(opcao: string): void {
+    this.respostaDigitada = opcao;
+    this.confirmarProximo();
+  }
 
-    this.respostaSelecionada = valor;
-    const acertou = valor.trim().toUpperCase() === this.desafioAtual.alvo.trim().toUpperCase();
-
-    if (acertou) {
-      this.acertosParciais++;
-      this.feedback = 'acerto';
-      this.mensagemFeedback = '🎉 Muito bem! Você acertou!';
-    } else {
-      this.errosParciais++;
-      this.feedback = 'erro';
-      this.mensagemFeedback = `❌ Ops! A resposta correta era: ${this.desafioAtual.alvo}`;
-    }
+  confirmarProximo(): void {
+    if (!this.desafioAtual || this.enviando) return;
+    const valor = this.respostaDigitada.trim();
+    if (!valor) return;
 
     this.respostasAluno.push({
       desafioId: this.desafioAtual.id,
-      resposta: valor,
-      acertou
+      resposta: valor
     });
 
-    this.cdr.detectChanges();
+    this.avancarOuFinalizar();
+  }
 
-    setTimeout(() => {
-      this.feedback = null;
-      this.mensagemFeedback = '';
-      this.respostaSelecionada = '';
+  // Seção 5 (A4): Desafios pulados ficam fora da lista (contam como erro no back)
+  pularDesafio(): void {
+    if (!this.desafioAtual || this.enviando) return;
+    this.avancarOuFinalizar();
+  }
 
-      if (this.indiceAtual + 1 < this.desafios.length) {
-        this.indiceAtual++;
-        this.cdr.detectChanges();
-      } else {
-        this.finalizarFase();
-      }
-    }, 1200);
+  private avancarOuFinalizar(): void {
+    this.respostaDigitada = '';
+    if (this.indiceAtual + 1 < this.desafios.length) {
+      this.indiceAtual++;
+      this.cdr.detectChanges();
+    } else {
+      this.finalizarFase();
+    }
   }
 
   finalizarFase(): void {
+    if (this.enviando) return;
+    this.enviando = true;
+    // Tempo contado em segundo plano (sem cronômetro na tela)
     const tempoSegundos = Math.max(1, Math.round((Date.now() - this.inicioTimestamp) / 1000));
-    this.sessaoService.enviarRespostasFase(this.faseId, tempoSegundos, this.respostasAluno).subscribe(res => {
-      this.resultadoFinal = res;
-      this.cdr.detectChanges();
+
+    this.sessaoService.enviarRespostasFase(this.faseId, tempoSegundos, this.respostasAluno).subscribe({
+      next: res => {
+        this.enviando = false;
+        this.resultadoFinal = res;
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        this.enviando = false;
+        this.erroFase = err?.error?.error?.message || 'Não foi possível enviar suas respostas.';
+        this.cdr.detectChanges();
+      }
     });
   }
 
   refazerFase(): void {
+    this.sessaoService.ultimoResultadoTentativa.set(null);
     this.iniciarFase();
   }
 
   irProximaFase(): void {
-    const proximoId = this.resultadoFinal?.proximaFaseId || (this.faseId < 5 ? this.faseId + 1 : null);
-    if (proximoId && proximoId <= 5) {
-      this.router.navigate(['/fase', proximoId]);
+    const proximoId = this.resultadoFinal?.proximaFaseId;
+    if (proximoId) {
+      this.router.navigate(['/aluno/fases', proximoId]);
     } else {
-      this.router.navigate(['/mapa']);
+      this.router.navigate(['/aluno/fases']);
     }
   }
 
   voltarAoMapa(): void {
-    this.router.navigate(['/mapa']);
+    this.router.navigate(['/aluno/fases']);
   }
 }

@@ -12,8 +12,10 @@ import { Sessao } from '../../../core/services/sessao';
   styleUrl: './login-professor.css'
 })
 export class LoginProfessor {
-  pin = '';
+  email = '';
+  senha = '';
   erro = '';
+  carregando = false;
 
   constructor(
     private sessaoService: Sessao,
@@ -23,19 +25,30 @@ export class LoginProfessor {
 
   entrar(): void {
     this.erro = '';
-    // Tenta autenticar no back-end com o professor padrão do .env
-    this.sessaoService.loginProfessor('professor@codebuddies.com', this.pin).subscribe({
+    if (!this.email.trim() || !this.senha) {
+      this.erro = 'Digite seu e-mail e senha.';
+      return;
+    }
+
+    this.carregando = true;
+    this.sessaoService.loginProfessor(this.email.trim(), this.senha).subscribe({
       next: () => {
-        this.router.navigate(['/professor/painel']);
+        this.carregando = false;
+        this.router.navigate(['/professor']);
       },
-      error: () => {
-        // Fallback local se digitar 1234 ou changeme
-        if (this.pin === '1234' || this.pin === 'changeme') {
-          this.router.navigate(['/professor/painel']);
+      error: (err) => {
+        this.carregando = false;
+        const apiErr = err?.error?.error;
+        const code = apiErr?.code;
+
+        if (code === 'CREDENCIAIS_INVALIDAS') {
+          this.erro = apiErr?.message || 'E-mail ou senha incorretos';
+        } else if (code === 'MUITAS_TENTATIVAS') {
+          this.erro = apiErr?.message || 'Aguarde um minuto e tente novamente';
         } else {
-          this.erro = 'E-mail ou senha incorretos (Use 1234)';
-          this.cdr.detectChanges();
+          this.erro = apiErr?.message || 'Não foi possível autenticar agora.';
         }
+        this.cdr.detectChanges();
       }
     });
   }
