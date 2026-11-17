@@ -12,6 +12,20 @@ import { Sessao, DesafioJogo } from '../../../core/services/sessao';
   styleUrl: './jogar-fase.css'
 })
 export class JogarFase implements OnInit {
+  private readonly teclasDesafio: Record<string, { resposta: string; simbolo: string; nome: string }> = {
+    backspace: { resposta: 'BACKSPACE', simbolo: '⌫', nome: 'Apagar' },
+    enter: { resposta: 'ENTER', simbolo: '↵', nome: 'Enter' },
+    espaco: { resposta: 'ESPACO', simbolo: '␣', nome: 'Espaço' },
+  };
+  readonly baloesCena = [
+    { id: 1, cor: 'vermelho' },
+    { id: 2, cor: 'vermelho' },
+    { id: 3, cor: 'vermelho' },
+    { id: 4, cor: 'azul' },
+    { id: 5, cor: 'amarelo' },
+  ];
+  readonly baloesEstourados = [1, 2];
+
   faseId = 1;
   faseAtual: any = null;
   tituloFase = '';
@@ -86,6 +100,21 @@ export class JogarFase implements OnInit {
     return this.desafios[this.indiceAtual];
   }
 
+  get mostrarCenaBaloes(): boolean {
+    const titulo = this.faseAtual?.titulo?.toLocaleLowerCase('pt-BR') || '';
+    return titulo.includes('balões') && [1, 2, 3].includes(this.desafioAtual?.ordem ?? 0);
+  }
+
+  get teclaAtual(): { resposta: string; simbolo: string; nome: string } | null {
+    const enunciado = this.desafioAtual?.enunciado?.toLocaleLowerCase('pt-BR') || '';
+    if (!enunciado) return null;
+
+    if (enunciado.includes('apaga')) return this.teclasDesafio.backspace;
+    if (enunciado.includes('linha de baixo')) return this.teclasDesafio.enter;
+    if (enunciado.includes('espaço')) return this.teclasDesafio.espaco;
+    return null;
+  }
+
   get progressoPct(): number {
     return this.desafios.length ? Math.round(((this.indiceAtual + 1) / this.desafios.length) * 100) : 0;
   }
@@ -94,6 +123,19 @@ export class JogarFase implements OnInit {
   @HostListener('window:keydown', ['$event'])
   aoPressionarTecla(event: KeyboardEvent): void {
     if (this.resultadoFinal || this.carregando || this.enviando || !this.desafioAtual) return;
+
+    const tecla = this.teclaAtual;
+    if (tecla) {
+      const corresponde =
+        (tecla.resposta === 'BACKSPACE' && event.key === 'Backspace') ||
+        (tecla.resposta === 'ENTER' && event.key === 'Enter') ||
+        (tecla.resposta === 'ESPACO' && (event.key === ' ' || event.code === 'Space'));
+      if (corresponde) {
+        event.preventDefault();
+        this.selecionarOpcao(tecla.resposta);
+      }
+      return;
+    }
 
     const tag = (event.target as HTMLElement)?.tagName;
     if (event.key === 'Enter' && this.respostaDigitada.trim() !== '') {

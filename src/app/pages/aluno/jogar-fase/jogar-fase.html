@@ -30,6 +30,40 @@
       <span class="etiqueta-etapa">{{ faseAtual?.nivel?.titulo || 'Desafio ' + (indiceAtual + 1) }}</span>
       <p class="pergunta">{{ desafioAtual.enunciado }}</p>
 
+      @if (mostrarCenaBaloes) {
+        <div class="cena-baloes" role="group" aria-label="Três balões vermelhos, um azul, um amarelo e dois balões estourados">
+          <div class="baloes-inflados">
+            @for (balao of baloesCena; track balao.id) {
+              @if (desafioAtual.ordem === 2 && balao.cor === 'azul') {
+                <button
+                  type="button"
+                  class="balao balao-azul"
+                  aria-label="Clique no balão azul"
+                  [disabled]="enviando"
+                  (click)="selecionarOpcao('AZUL')">
+                  <span class="sr-only">Balão azul</span>
+                </button>
+              } @else {
+                <span
+                  class="balao"
+                  [class.balao-vermelho]="balao.cor === 'vermelho'"
+                  [class.balao-azul]="balao.cor === 'azul'"
+                  [class.balao-amarelo]="balao.cor === 'amarelo'"
+                  role="img"
+                  [attr.aria-label]="'Balão ' + balao.cor">
+                </span>
+              }
+            }
+          </div>
+          <div class="baloes-estourados" aria-label="Dois balões estourados">
+            <span class="legenda-estourados">Balões estourados</span>
+            @for (estouro of baloesEstourados; track estouro) {
+              <span class="efeito-estouro" aria-hidden="true">💥</span>
+            }
+          </div>
+        </div>
+      }
+
       @if (desafioAtual.opcoes && desafioAtual.opcoes.length > 0) {
         <div class="opcoes-container" style="margin-bottom: 16px;">
           @for (opcao of desafioAtual.opcoes; track opcao) {
@@ -44,32 +78,48 @@
         </div>
       }
 
-      <div style="margin: 16px 0; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-        <input
-          type="text"
-          [(ngModel)]="respostaDigitada"
-          placeholder="Digite sua resposta aqui..."
-          style="font-size: 1.4rem; padding: 12px 18px; border-radius: 12px; border: 2px solid #ccc; text-align: center; width: 100%; max-width: 400px;"
-          autofocus />
-
-        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      @if (teclaAtual; as tecla) {
+        <div class="tecla-desafio">
+          <p>Pressione esta tecla no teclado ou clique nela:</p>
           <button
             type="button"
-            class="btn-acao btn-avancar"
-            [disabled]="!respostaDigitada.trim() || enviando"
-            (click)="confirmarProximo()">
-            {{ indiceAtual + 1 === desafios.length ? 'Finalizar ✅' : 'Próximo ➡️' }}
-          </button>
-
-          <button
-            type="button"
-            class="btn-acao btn-refazer"
+            class="tecla-interativa"
+            [class.tecla-espaco]="tecla.resposta === 'ESPACO'"
             [disabled]="enviando"
-            (click)="pularDesafio()">
-            Pular ⏭️
+            [attr.aria-label]="'Pressionar tecla ' + tecla.nome"
+            (click)="selecionarOpcao(tecla.resposta)">
+            <span class="tecla-simbolo">{{ tecla.simbolo }}</span>
+            <span>{{ tecla.nome }}</span>
           </button>
         </div>
-      </div>
+      } @else {
+        <div style="margin: 16px 0; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+          <input
+            type="text"
+            [(ngModel)]="respostaDigitada"
+            placeholder="Digite sua resposta aqui..."
+            style="font-size: 1.4rem; padding: 12px 18px; border-radius: 12px; border: 2px solid #ccc; text-align: center; width: 100%; max-width: 400px;"
+            autofocus />
+
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <button
+              type="button"
+              class="btn-acao btn-avancar"
+              [disabled]="!respostaDigitada.trim() || enviando"
+              (click)="confirmarProximo()">
+              {{ indiceAtual + 1 === desafios.length ? 'Finalizar ✅' : 'Próximo ➡️' }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-acao btn-refazer"
+              [disabled]="enviando"
+              (click)="pularDesafio()">
+              Pular ⏭️
+            </button>
+          </div>
+        </div>
+      }
     </main>
   }
 
