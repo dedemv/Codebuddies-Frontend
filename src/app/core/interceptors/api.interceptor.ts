@@ -44,16 +44,17 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
           break;
 
         case 'SESSAO_FECHADA':
+          // A aula acabou: o aluno vai para o ranking (sem apagar a sessão, senão perde o sessaoId do ranking)
           if (sessao.perfil === 'ALUNO') {
-            sessao.limparSessao();
-            router.navigate(['/']);
+            router.navigate(['/aluno/ranking']);
           }
           break;
 
         case 'FASE_BLOQUEADA':
-        case 'FASE_SEM_DESAFIOS':
           router.navigate(['/aluno/fases']);
           break;
+
+        // FASE_SEM_DESAFIOS: não redireciona — a tela "Jogar" mostra a mensagem com o botão "Voltar ao Mapa"
 
         case 'JSON_INVALIDO':
         case 'DESAFIO_FORA_DA_FASE':

@@ -407,7 +407,7 @@ export class Sessao {
         return {
           aberta,
           sessao,
-          turma: sessao?.turma?.nome || res?.turma?.nome || ''
+          turma: sessao?.turmaNome || sessao?.turma?.nome || ''
         };
       })
     );

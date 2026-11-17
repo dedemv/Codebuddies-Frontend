@@ -45,7 +45,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
               <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-weight: bold;">🟢 AULA EM ANDAMENTO</span>
-              <h2 style="margin-top: 8px;">Aula #{{ sessaoAberta.id }} — Turma ID {{ sessaoAberta.turmaId }}</h2>
+              <h2 style="margin-top: 8px;">Aula #{{ sessaoAberta.id }} — {{ sessaoAberta.turmaNome || 'Turma ' + sessaoAberta.turmaId }}</h2>
               <p>Alunos presentes na aula ({{ alunosNaSessaoAberta.length }}): atualiza automaticamente a cada 10s.</p>
             </div>
 
@@ -366,7 +366,7 @@
             <div class="card-aluno-item">
               <div>
                 <h3>Fase {{ f.ordem }}: {{ f.titulo }}</h3>
-                <small>Tipo: {{ f.tipo }} · Nível ID: {{ f.nivelId }}</small>
+                <small>Tipo: {{ f.tipo }} · Nível: {{ f.nivel?.titulo || f.nivelId }}</small>
                 @if (f.totalDesafios === 0) {
                   <span style="background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 8px; font-weight: bold; margin-left: 8px;">
                     ⚠️ Incompleta (Sem desafios)
@@ -374,7 +374,7 @@
                 }
               </div>
               <div class="acoes-direita">
-                <button type="button" class="btn-ver" (click)="abrirDesafiosDaFase(f)">Gerenciar Desafios ({{ f.desafios?.length ?? '?' }})</button>
+                <button type="button" class="btn-ver" (click)="abrirDesafiosDaFase(f)">Gerenciar Desafios ({{ f.totalDesafios ?? '?' }})</button>
                 <button type="button" class="btn-status-toggle" (click)="removerFase(f.id)">🗑️ Excluir</button>
               </div>
             </div>
